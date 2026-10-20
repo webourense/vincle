@@ -3,54 +3,83 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dúo – dos auriculares, una canción</title>
+<title>BiBeat – dos auriculares, un solo latido</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Unbounded:wght@800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#141a2e;--panel:#1d2540;--line:#34406a;--txt:#eef0fa;--mut:#9aa3c7;--a:#7fd6c2;--b:#b9a6ff;--err:#ff8f9c;color-scheme:dark}
-@media(prefers-color-scheme:light){:root{--bg:#f2f3fa;--panel:#fff;--line:#cfd4ea;--txt:#1a2140;--mut:#5b6590;--a:#1f9c84;--b:#6a54d6;--err:#c93a4d;color-scheme:light}}
+:root{--bg:#0b0814;--panel:#151027;--line:#2c2450;--txt:#f4f0ff;--mut:#a89fcf;--a:#28e0ff;--b:#ff3d8b;--gold:#ffd166;--err:#ff8f9c;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--txt);font:16px/1.5 "Gill Sans","Trebuchet MS",Verdana,sans-serif;padding:20px 16px 48px}
-main{max-width:560px;margin:0 auto}
-h1{font-size:1.9rem;margin:8px 0 4px;letter-spacing:-.01em}
-p{margin:0 0 12px}
-.mut{color:var(--mut);font-size:.92rem}
-.rings{display:block;margin:6px auto 0;width:160px;height:auto}
-.rings circle{fill:none;stroke-width:calc(5px + var(--lvl,0)*10px);transition:stroke-width .08s}
-.rings .r1{stroke:var(--a)}.rings .r2{stroke:var(--b)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}
+body{background:radial-gradient(900px 500px at 15% -10%,#1a2a5a55,transparent),radial-gradient(800px 500px at 100% 0,#5a1a4a55,transparent),var(--bg);background-attachment:fixed;color:var(--txt);font:16px/1.5 Outfit,"Avenir Next","Trebuchet MS",sans-serif;padding:18px 16px 60px}
+main{max-width:620px;margin:0 auto}
+h1{font:800 clamp(2.6rem,12vw,4rem)/1 Unbounded,"Arial Black",Impact,sans-serif;margin:0;letter-spacing:-.04em;text-align:center}
+.tag{text-align:center;color:var(--mut);margin:6px 0 0}
+p{margin:0 0 12px}.mut{color:var(--mut);font-size:.92rem}
+.logo{display:block;margin:0 auto -4px;width:120px}
+.logo circle{fill:none;stroke-width:calc(5px + var(--lvl,0)*9px);transition:stroke-width .08s}
+.logo .r1{stroke:var(--a)}.logo .r2{stroke:var(--b)}
+#cv{display:block;width:100%;height:110px;margin:10px 0 0;border-radius:14px}
+body.big #cv{position:fixed;inset:0;width:100vw;height:100vh;z-index:60;margin:0;border-radius:0;background:var(--bg)}
+#bigT{display:none;position:fixed;z-index:61;left:0;right:0;bottom:8vh;text-align:center;font:800 clamp(1.4rem,6vw,3rem) Unbounded,sans-serif;padding:0 16px;pointer-events:none}
+body.big #bigT{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
+.count{text-align:center;border-color:#3b3068}
+#cnt{font:800 2.4rem/1 Unbounded,sans-serif;color:var(--gold)}
+.bar{height:8px;background:var(--line);border-radius:8px;margin:12px 0 6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:width 1.2s}
 .choose{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-button{font:inherit;color:var(--txt);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;cursor:pointer;text-align:center}
-button:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
-button.main{background:var(--a);color:#0d1a17;border-color:var(--a);font-weight:700}
-button.alt{background:var(--b);color:#16102f;border-color:var(--b);font-weight:700}
-.choose button{padding:18px 10px;font-weight:700}
-input[type=text]{width:100%;background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+button{font:inherit;color:var(--txt);background:#1d1636;border:1px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer}
+button:hover{border-color:var(--a)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.main{background:var(--a);color:#04222a;border-color:var(--a);font-weight:600}
+button.alt{background:var(--b);color:#2a0215;border-color:var(--b);font-weight:600}
+button.on,.tabs button.sel{border-color:var(--a);color:var(--a)}
+.choose button{padding:22px 10px;font-weight:600;font-size:1.05rem}
+input[type=text]{width:100%;background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:11px;font:inherit}
 #codeIn{font-size:1.8rem;letter-spacing:.3em;text-align:center;text-transform:uppercase}
-input[type=range]{width:100%}
-label{display:block;margin:4px 0 6px;font-weight:700}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.row>*{flex:1}
-.step{font-weight:700;margin:0 0 8px}
-#status{padding:10px 14px;border-radius:10px;border:1px solid var(--line);margin:14px 0;font-size:.95rem}
+input[type=range]{width:100%;accent-color:var(--b)}
+label{display:block;margin:4px 0 6px;font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+.step{font-weight:600;margin:0 0 8px}
+#status{padding:10px 14px;border-radius:12px;border:1px solid var(--line);margin:14px 0;font-size:.95rem}
 #status.ok{border-color:var(--a)}#status.bad{border-color:var(--err);color:var(--err)}
-#code{font-size:3rem;font-weight:700;letter-spacing:.25em;text-align:center;color:var(--a);margin:4px 0 8px;padding-left:.25em}
-audio{width:100%;margin-top:10px}
-ol.list{list-style:none;margin:10px 0 0;padding:0}
-ol.list button{width:100%;text-align:left;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-ol.list button.cur{border-color:var(--a);color:var(--a);font-weight:700}
-#now{font-weight:700;margin:6px 0 0;min-height:1.5em}
-details{margin-top:18px}summary{cursor:pointer;font-weight:700}
+#code{font:800 2.6rem/1.1 Unbounded,sans-serif;letter-spacing:.2em;text-align:center;color:var(--a);margin:4px 0 8px;padding-left:.2em}
+audio{width:100%;margin-top:10px;color-scheme:dark}
+#now,#title{font-weight:600;min-height:1.5em;margin:8px 0 0}
+ol.list{list-style:none;margin:10px 0 0;padding:0;max-height:300px;overflow:auto}
+ol.list button{width:100%;text-align:left;margin-bottom:5px;padding:8px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ol.list button.cur{border-color:var(--b);color:var(--b);font-weight:600}
+.hist{list-style:none;margin:10px 0 0;padding:0 0 0 18px;border-left:2px solid var(--line)}
+.hist li{position:relative;margin:0 0 14px;color:var(--mut)}
+.hist li:before{content:"";position:absolute;left:-26px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--line)}
+.hist li.got{color:var(--txt)}.hist li.got:before{background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.hist b{display:block}
+details{margin-top:18px}summary{cursor:pointer;font-weight:600}
+#toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-140%);background:var(--gold);color:#2b2000;font-weight:600;padding:12px 18px;border-radius:14px;z-index:90;transition:transform .5s;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .hide{display:none}
+@media(prefers-reduced-motion:reduce){.bar i,#toast{transition:none}}
 </style>
 </head>
 <body>
+<canvas id="fx"></canvas><div id="toast" role="status"></div>
 <main>
-<svg class="rings" viewBox="0 0 150 80" aria-hidden="true"><circle class="r1" cx="52" cy="40" r="26"/><circle class="r2" cx="98" cy="40" r="26"/></svg>
-<h1>Dúo</h1>
-<p class="mut">Una canción en dos móviles a la vez, cada uno con sus auriculares Bluetooth.</p>
+<svg class="logo" viewBox="0 0 150 80" aria-hidden="true"><circle class="r1" cx="52" cy="40" r="26"/><circle class="r2" cx="98" cy="40" r="26"/></svg>
+<h1>BiBeat</h1>
+<p class="tag">Dos auriculares. Un solo latido.</p>
+<canvas id="cv" aria-hidden="true"></canvas><div id="bigT"></div>
+<div class="row"><button id="bigB">Modo concierto</button></div>
+
+<div class="card count">
+  <div id="cnt">…</div>
+  <p class="mut" style="margin:6px 0 0">personas ya han usado BiBeat</p>
+  <div class="bar"><i id="prog"></i></div>
+  <p class="mut" id="next" style="margin:0"></p>
+  <p class="mut" id="ses" style="margin:6px 0 0"></p>
+</div>
 
 <div id="status" role="status">Elige tu papel para empezar.</div>
-
 <div class="choose" id="choose">
   <button id="pickHost">Pongo la música</button>
   <button id="pickGuest">Quiero escuchar</button>
@@ -60,27 +89,48 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:700}
 <section id="host" class="hide">
   <div class="card">
     <p class="step">Tu código de sala</p>
-    <div id="code" aria-live="polite">· · · · ·</div>
-    <div class="row">
-      <button id="copyLink">Copiar enlace</button>
-      <button id="shareLink" class="main">Enviar por WhatsApp</button>
+    <div id="code" aria-live="polite">·····</div>
+    <div class="row"><button id="copyLink">Copiar enlace</button><button id="shareLink" class="main">Enviar por WhatsApp</button></div>
+    <p class="mut" style="margin:10px 0 0" id="listeners"></p>
+  </div>
+
+  <div class="tabs"><button id="tabA" class="sel">Mi música</button><button id="tabS">Spotify</button></div>
+
+  <div id="audioPanel">
+    <div class="card">
+      <p class="step">Biblioteca</p>
+      <div class="row" style="margin:0">
+        <button id="pickDir" class="main">Elegir carpeta</button>
+        <button id="pickFiles">Elegir archivos</button>
+      </div>
+      <input type="file" id="dir" webkitdirectory multiple class="hide">
+      <input type="file" id="files" accept="audio/*" multiple class="hide">
+      <input type="text" id="q" placeholder="Buscar en la biblioteca…" class="hide" style="margin-top:10px">
+      <p class="mut" id="libInfo" style="margin:8px 0 0">Una carpeta entera, con sus subcarpetas, o los archivos que quieras (mp3, m4a, wav, flac, ogg).</p>
+      <ol class="list" id="list"></ol>
     </div>
-    <p class="mut" style="margin-top:10px" id="listeners">Todavía no hay nadie conectado. Quien abra el enlace entra directo, o puede escribir el código.</p>
+    <div class="card">
+      <p id="now" style="margin:0">Nada en reproducción</p>
+      <audio id="player" controls></audio>
+      <div class="row"><button id="prev">Anterior</button><button id="next2">Siguiente</button><button id="shuf">Aleatorio</button><button id="rep">Repetir: no</button></div>
+      <div class="row"><button id="tabCap" class="hide">Compartir audio de una pestaña (PC)</button></div>
+    </div>
+    <div class="card">
+      <label for="dly">Sincronía: mi retraso <span id="dlyV">200</span> ms</label>
+      <input type="range" id="dly" min="0" max="1000" step="10" value="200">
+      <div class="row"><button id="dm">− 10 ms</button><button id="dp">+ 10 ms</button></div>
+      <p class="mut" style="margin:10px 0 0">Si lo oyes antes que ella, sube el valor. Si después, bájalo. Se recuerda.</p>
+    </div>
   </div>
-  <div class="card">
-    <p class="step">Música</p>
-    <input type="file" id="files" accept="audio/*" multiple>
-    <p id="now"></p>
-    <audio id="player" controls></audio>
-    <ol class="list" id="list"></ol>
-    <div class="row"><button id="tabCap" class="hide">Compartir audio de una pestaña (PC)</button></div>
-    <p class="mut" style="margin-top:10px">Spotify no se puede capturar desde el móvil: usa archivos tuyos (mp3, m4a, wav).</p>
-  </div>
-  <div class="card">
-    <label for="dly">Sincronía: mi retraso <span id="dlyV">200</span> ms</label>
-    <input type="range" id="dly" min="0" max="1000" step="10" value="200">
-    <div class="row"><button id="dm">− 10 ms</button><button id="dp">+ 10 ms</button></div>
-    <p class="mut" style="margin-top:10px">Si lo oyes antes que ella, sube el valor. Si lo oyes después, bájalo. Se recuerda para la próxima vez.</p>
+
+  <div id="spPanel" class="hide">
+    <div class="card">
+      <p class="step">Spotify sincronizado</p>
+      <input type="text" id="spIn" placeholder="Pega un enlace de Spotify (canción, álbum o lista)" autocomplete="off">
+      <div class="row"><button id="spGo" class="main">Cargar en los dos</button></div>
+      <div id="spHostEl" style="margin-top:12px"></div>
+      <p class="mut" style="margin:10px 0 0">Spotify no permite copiar su audio, así que cada móvil lo reproduce con su propia cuenta y BiBeat los mantiene en sincronía: play, pausa, saltos y cambios de canción. Los dos necesitáis tener Spotify abierto en ese navegador. Con la sesión iniciada suena entera; si no, solo fragmentos.</p>
+    </div>
   </div>
 </section>
 
@@ -93,140 +143,258 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:700}
   </div>
   <div class="card hide" id="listen">
     <p class="mut" style="margin:0">Sonando</p>
-    <p id="title" style="font-weight:700;margin:0">…</p>
-    <audio id="remote" controls autoplay playsinline></audio>
-    <div class="row"><button id="tapPlay" class="alt hide">Toca para escuchar</button></div>
-    <p class="mut" style="margin:10px 0 0">El volumen se cambia con los botones de tu móvil.</p>
+    <p id="title">…</p>
+    <div id="gAudio"><audio id="remote" controls autoplay playsinline></audio>
+      <div class="row"><button id="tapPlay" class="alt hide">Toca para escuchar</button></div></div>
+    <div id="gSp" class="hide"><div id="spGuestEl"></div>
+      <p class="mut" style="margin:10px 0 0">Spotify se sincroniza solo con quien pone la música. Si no suena, pulsa play una vez en el reproductor.</p></div>
   </div>
 </section>
+
+<div class="card">
+  <p class="step">La historia de BiBeat</p>
+  <p class="mut" style="margin:0">Cada 1.000 personas que usan BiBeat se desbloquea un hito.</p>
+  <ol class="hist" id="hist"></ol>
+</div>
 
 <details>
   <summary>Cómo usarlo</summary>
   <ol class="mut">
     <li>Cada uno conecta sus auriculares Bluetooth a su propio móvil.</li>
-    <li>Tú eliges «Pongo la música» y le envías el enlace o el código de 5 letras.</li>
-    <li>Ella abre el enlace (o escribe el código) y pulsa «Escuchar».</li>
-    <li>Dale al play y ajusta la sincronía con el deslizador.</li>
+    <li>Tú eliges «Pongo la música» y envías el enlace o el código de 5 letras.</li>
+    <li>Ella abre el enlace y pulsa «Escuchar».</li>
+    <li>Elige una carpeta de música o un enlace de Spotify, y dale al play.</li>
   </ol>
-  <p class="mut">Necesitáis internet (datos o wifi). Mantened la pantalla encendida y la pestaña abierta. Pueden escuchar varias personas a la vez.</p>
+  <p class="mut">Hace falta internet en los dos móviles. Mantened la pantalla encendida y la pestaña abierta. Elegir una carpeta entera funciona en Chrome, Edge y Android; en iPhone usa «Elegir archivos». Pulsa la barra espaciadora para pausar desde el PC.</p>
 </details>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const AL='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const NS='bibeat-k2',AL='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const rnd=n=>Array.from({length:n},()=>AL[Math.floor(Math.random()*AL.length)]).join('');
 const hq=s=>s.replace(/useinbandfec=1/g,'useinbandfec=1;stereo=1;sprop-stereo=1;maxaveragebitrate=192000');
 const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
-let peer,ctx,dest,delay,queue=[],qi=0,conns=[],roomCode='',vizOn=false;
+const fmt=n=>n.toLocaleString('es-ES');
+let peer,ctx,dest,delay,an,queue=[],view=[],qi=-1,conns=[],roomCode='',last={m:'audio',t:''},shuf=false,rep=0,counted=false;
 
 function status(t,c){const s=$('status');s.textContent=t;s.className=c||''}
 function show(id){$('choose').classList.add('hide');$(id).classList.remove('hide')}
 function toggleOn(v){document.body.classList.toggle('on',v)}
 async function keepAwake(){try{await navigator.wakeLock.request('screen')}catch(e){}}
-function viz(node,c){
-  if(vizOn)return;vizOn=true;
-  const an=c.createAnalyser();an.fftSize=256;node.connect(an);
-  const d=new Uint8Array(an.fftSize);
-  (function f(){an.getByteTimeDomainData(d);let m=0;for(const v of d)m=Math.max(m,Math.abs(v-128));
-    document.documentElement.style.setProperty('--lvl',Math.min(1,m/90).toFixed(2));requestAnimationFrame(f)})();
-}
 if(typeof Peer==='undefined')status('No se pudo cargar la conexión. Revisa tu internet y recarga.','bad');
 
-// ---------- ANFITRIÓN ----------
+// ---------- CONTADOR E HISTORIA ----------
+const HITOS=['Primer latido','El eco','Doble bajo','Hora punta','Sala llena','Estadio','Festival','Gira mundial','Cuenta atrás','Leyenda'];
+const hitoName=i=>HITOS[i-1]||('Hito '+i);
+async function ab(op,key){try{const r=await fetch('https://abacus.jasoncameron.dev/'+op+'/'+NS+'/'+key);if(!r.ok)return op==='get'?0:null;const j=await r.json();return +j.value}catch(e){return null}}
+function renderCount(n){
+  const el=$('cnt'),t0=performance.now();
+  (function f(t){const k=Math.min(1,(t-t0)/1200);el.textContent=fmt(Math.round(n*k));if(k<1)requestAnimationFrame(f)})(t0);
+  const got=Math.floor(n/1000),to=(got+1)*1000;
+  $('prog').style.width=((n%1000)/10)+'%';
+  $('next').textContent='Faltan '+fmt(to-n)+' para el hito de '+fmt(to)+': «'+hitoName(got+1)+'»';
+  const h=$('hist');h.textContent='';
+  const from=Math.max(1,got-4);
+  for(let i=from;i<=got+1;i++){
+    const li=document.createElement('li'),b=document.createElement('b');
+    b.textContent=fmt(i*1000)+' · '+hitoName(i);
+    li.appendChild(b);li.append(i<=got?'Desbloqueado':'Por desbloquear');
+    if(i<=got)li.className='got';h.appendChild(li);
+  }
+  if(!got){const li=document.createElement('li');li.textContent='Todavía no hay hitos: el primero llega a las 1.000 personas.';h.prepend(li)}
+}
+async function initCounter(){
+  const first=!store.get('bb-counted');
+  const n=await ab(first?'hit':'get','usuarios');
+  if(n===null){$('cnt').textContent='—';$('next').textContent='No se pudo leer el contador ahora mismo.';return}
+  if(first)store.set('bb-counted','1');
+  renderCount(n);
+  const ms=Math.floor(n/1000),seen=store.get('bb-ms');
+  if(first&&n%1000===0)celebrate('¡Eres la persona número '+fmt(n)+'! Hito «'+hitoName(ms)+'» desbloqueado');
+  else if(seen!==null&&ms>+seen)celebrate('¡Nuevo hito de BiBeat! '+fmt(ms*1000)+' personas: «'+hitoName(ms)+'»');
+  store.set('bb-ms',ms);
+  const s=await ab('get','sesiones');if(s)$('ses').textContent=fmt(s)+' sesiones de música compartida';
+}
+function celebrate(msg){
+  const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),6000);
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const c=$('fx'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+  const P=Array.from({length:160},()=>({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*14,vy:-Math.random()*14-3,c:['#28e0ff','#ff3d8b','#ffd166','#fff'][Math.random()*4|0],s:3+Math.random()*5}));
+  let f=0;(function d(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++f<130)requestAnimationFrame(d);else x.clearRect(0,0,c.width,c.height)})();
+}
+async function countSession(){if(counted)return;counted=true;const s=await ab('hit','sesiones');if(s)$('ses').textContent=fmt(s)+' sesiones de música compartida'}
+initCounter();
+
+// ---------- VISUALIZADOR ----------
+function viz(node,c){an=c.createAnalyser();an.fftSize=128;node.connect(an)}
+const cv=$('cv'),g=cv.getContext('2d');let ph=0;
+(function draw(){
+  const d=devicePixelRatio||1,w=cv.clientWidth*d,h=cv.clientHeight*d;
+  if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}
+  g.clearRect(0,0,w,h);const N=40,bw=w/(N*2),data=an?new Uint8Array(an.frequencyBinCount):null;
+  if(an)an.getByteFrequencyData(data);
+  ph+=.04;let sum=0;
+  for(let i=0;i<N;i++){
+    const v=data?data[Math.floor(i*data.length*.7/N)]/255:(.12+.1*Math.sin(ph+i*.35));
+    sum+=v;const bh=Math.max(3*d,v*h*.95);
+    g.fillStyle='#28e0ff';g.fillRect(w/2-(i+1)*bw,h-bh,bw*.7,bh);
+    g.fillStyle='#ff3d8b';g.fillRect(w/2+i*bw+bw*.3,h-bh,bw*.7,bh);
+  }
+  document.documentElement.style.setProperty('--lvl',Math.min(1,sum/N*1.6).toFixed(2));
+  requestAnimationFrame(draw);
+})();
+$('bigB').onclick=()=>document.body.classList.add('big');
+document.addEventListener('click',e=>{if(document.body.classList.contains('big')&&e.target.id!=='bigB')document.body.classList.remove('big')});
+function setTitle(t){$('bigT').textContent=t||''}
+
+// ---------- ANFITRIÓN: conexión ----------
 function ensureAudio(){
   if(ctx){ctx.resume();return}
   ctx=new (window.AudioContext||window.webkitAudioContext)();
   dest=ctx.createMediaStreamDestination();
   delay=ctx.createDelay(2);delay.delayTime.value=$('dly').value/1000;
   const src=ctx.createMediaElementSource($('player'));
-  src.connect(dest);src.connect(delay);delay.connect(ctx.destination);
-  viz(src,ctx);
+  src.connect(dest);src.connect(delay);delay.connect(ctx.destination);viz(src,ctx);
 }
 function updListeners(){
   const n=conns.length;toggleOn(n>0);
   $('listeners').textContent=n?(n===1?'1 persona escuchando.':n+' personas escuchando.'):'Todavía no hay nadie conectado. Quien abra el enlace entra directo, o puede escribir el código.';
-  if(n)status('Conectados. Ya se oye en los dos móviles.','ok');
+  if(n)status('Conectados. Ya suena en los dos móviles.','ok');
 }
-function sendTitle(){const t=$('now').textContent;conns.forEach(x=>x.c.open&&x.c.send({t}))}
+function bcast(m){last=m;conns.forEach(x=>x.c.open&&x.c.send(m))}
 function openRoom(n){
-  roomCode=rnd(5);
-  peer=new Peer('duo-'+roomCode);
-  peer.on('open',()=>{$('code').textContent=roomCode;status('Sala lista. Envíale el enlace o el código.');});
-  peer.on('error',e=>{
-    if(e.type==='unavailable-id'&&n<5){peer.destroy();openRoom(n+1)}
-    else status('No se pudo abrir la sala ('+e.type+'). Recarga la página.','bad');
-  });
+  roomCode=rnd(5);peer=new Peer('duo-'+roomCode);
+  peer.on('open',()=>{$('code').textContent=roomCode;status('Sala lista. Envíale el enlace o el código.')});
+  peer.on('error',e=>{if(e.type==='unavailable-id'&&n<5){peer.destroy();openRoom(n+1)}else status('No se pudo abrir la sala ('+e.type+'). Recarga la página.','bad')});
   peer.on('disconnected',()=>{try{peer.reconnect()}catch(e){}});
   peer.on('connection',c=>{
     c.on('open',()=>{
       ensureAudio();
-      const call=peer.call(c.peer,dest.stream,{sdpTransform:hq});
-      const item={c,call};conns.push(item);updListeners();keepAwake();
-      c.send({t:$('now').textContent});
+      const call=peer.call(c.peer,dest.stream,{sdpTransform:hq}),item={c,call};
+      conns.push(item);updListeners();keepAwake();countSession();c.send(last);
       const drop=()=>{conns=conns.filter(x=>x!==item);updListeners()};
       call.on('close',drop);c.on('close',drop);
     });
   });
 }
 $('pickHost').onclick=()=>{
-  show('host');ensureAudio();openRoom(0);status('Abriendo sala…');
+  show('host');ensureAudio();openRoom(0);status('Abriendo sala…');updListeners();
   if(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia&&!/Android|iPhone|iPad/i.test(navigator.userAgent))$('tabCap').classList.remove('hide');
 };
 const link=()=>location.href.split('?')[0].split('#')[0]+'?sala='+roomCode;
-$('copyLink').onclick=async()=>{
-  if(!roomCode)return;
-  try{await navigator.clipboard.writeText(link());status('Enlace copiado.','ok')}catch(e){prompt('Copia el enlace:',link())}
-};
+$('copyLink').onclick=async()=>{if(!roomCode)return;try{await navigator.clipboard.writeText(link());status('Enlace copiado.','ok')}catch(e){prompt('Copia el enlace:',link())}};
 $('shareLink').onclick=async()=>{
-  if(!roomCode)return;
-  const text='Escucha conmigo en Dúo. Código: '+roomCode;
-  if(navigator.share){try{await navigator.share({title:'Dúo',text,url:link()})}catch(e){}}
+  if(!roomCode)return;const text='Escucha conmigo en BiBeat. Código: '+roomCode;
+  if(navigator.share){try{await navigator.share({title:'BiBeat',text,url:link()})}catch(e){}}
   else window.open('https://wa.me/?text='+encodeURIComponent(text+' '+link()));
 };
+
+// ---------- ANFITRIÓN: biblioteca ----------
+const AUD=/\.(mp3|m4a|aac|wav|ogg|oga|opus|flac|weba)$/i;
 const nm=f=>f.name.replace(/\.[^.]+$/,'');
+function addFiles(list){
+  const fs=[...list].filter(f=>(f.type&&f.type.startsWith('audio/'))||AUD.test(f.name));
+  if(!fs.length)return status('No he encontrado música en esa selección.','bad');
+  fs.sort((a,b)=>(a.webkitRelativePath||a.name).localeCompare(b.webkitRelativePath||b.name,'es',{numeric:true}));
+  queue=fs;$('q').classList.remove('hide');$('q').value='';
+  $('libInfo').textContent=fs.length+(fs.length===1?' canción cargada.':' canciones cargadas.');
+  renderList();loadTrack(0,false);
+}
 function renderList(){
-  const ol=$('list');ol.textContent='';
-  queue.forEach((f,i)=>{
+  const q=$('q').value.toLowerCase(),ol=$('list');ol.textContent='';
+  view=queue.map((f,i)=>i).filter(i=>(queue[i].webkitRelativePath||queue[i].name).toLowerCase().includes(q));
+  view.slice(0,300).forEach(i=>{
     const li=document.createElement('li'),b=document.createElement('button');
-    b.textContent=nm(f);if(i===qi)b.className='cur';
+    b.textContent=nm(queue[i]);b.title=queue[i].webkitRelativePath||queue[i].name;if(i===qi)b.className='cur';
     b.onclick=()=>loadTrack(i,true);li.appendChild(b);ol.appendChild(li);
   });
+  if(view.length>300){const li=document.createElement('li');li.className='mut';li.textContent='Mostrando 300 de '+view.length+'. Usa el buscador.';ol.appendChild(li)}
 }
 function loadTrack(i,play){
-  ensureAudio();qi=i;const p=$('player');
-  p.src=URL.createObjectURL(queue[i]);$('now').textContent=nm(queue[i]);
-  renderList();sendTitle();if(play)p.play().catch(()=>{});
+  ensureAudio();qi=i;const p=$('player'),t=nm(queue[i]);
+  p.src=URL.createObjectURL(queue[i]);$('now').textContent=t;setTitle(t);
+  renderList();bcast({m:'audio',t});if(play)p.play().catch(()=>{});
+  if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'BiBeat'});
+    [['play',()=>p.play()],['pause',()=>p.pause()],['previoustrack',prev],['nexttrack',next]].forEach(([a,f])=>{try{navigator.mediaSession.setActionHandler(a,f)}catch(e){}})}
 }
-$('files').onchange=e=>{queue=[...e.target.files];if(queue.length)loadTrack(0,false)};
-$('player').onended=()=>{if(qi+1<queue.length)loadTrack(qi+1,true)};
+function next(){if(!queue.length)return;loadTrack(shuf?Math.floor(Math.random()*queue.length):(qi+1)%queue.length,true)}
+function prev(){if(!queue.length)return;if($('player').currentTime>3)$('player').currentTime=0;else loadTrack((qi-1+queue.length)%queue.length,true)}
+$('pickDir').onclick=()=>$('dir').click();$('pickFiles').onclick=()=>$('files').click();
+$('dir').onchange=e=>addFiles(e.target.files);$('files').onchange=e=>addFiles(e.target.files);
+$('q').oninput=renderList;
+$('next2').onclick=next;$('prev').onclick=prev;
+$('shuf').onclick=e=>{shuf=!shuf;e.target.classList.toggle('on',shuf);e.target.textContent='Aleatorio: '+(shuf?'sí':'no')};
+$('rep').onclick=e=>{rep=(rep+1)%3;e.target.textContent='Repetir: '+['no','todo','una'][rep];e.target.classList.toggle('on',rep>0)};
+$('player').onended=()=>{if(rep===2){$('player').play()}else if(shuf||rep===1||qi+1<queue.length)next()};
 $('player').onplay=()=>{if(ctx)ctx.resume()};
-function setDelay(v){
-  v=Math.max(0,Math.min(1000,v));$('dly').value=v;$('dlyV').textContent=v;
-  if(delay)delay.delayTime.value=v/1000;store.set('duo-delay',v);
-}
-$('dly').oninput=e=>setDelay(+e.target.value);
-$('dm').onclick=()=>setDelay(+$('dly').value-10);
-$('dp').onclick=()=>setDelay(+$('dly').value+10);
-{const s=store.get('duo-delay');if(s!==null)setDelay(+s)}
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|BUTTON|AUDIO/.test(document.activeElement.tagName)&&!$('host').classList.contains('hide')&&!$('audioPanel').classList.contains('hide')){e.preventDefault();const p=$('player');p.paused?p.play():p.pause()}});
+function setDelay(v){v=Math.max(0,Math.min(1000,v));$('dly').value=v;$('dlyV').textContent=v;if(delay)delay.delayTime.value=v/1000;store.set('bb-delay',v)}
+$('dly').oninput=e=>setDelay(+e.target.value);$('dm').onclick=()=>setDelay(+$('dly').value-10);$('dp').onclick=()=>setDelay(+$('dly').value+10);
+{const s=store.get('bb-delay');if(s!==null)setDelay(+s)}
 $('tabCap').onclick=async()=>{
-  try{
-    ensureAudio();
-    const st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
+  try{ensureAudio();const st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
     const at=st.getAudioTracks();st.getVideoTracks().forEach(t=>t.stop());
-    if(!at.length){status('Marca «Compartir audio de la pestaña» en el selector.','bad');return}
+    if(!at.length)return status('Marca «Compartir audio de la pestaña» en el selector.','bad');
     const s=ctx.createMediaStreamSource(new MediaStream(at));s.connect(dest);viz(s,ctx);
-    $('now').textContent='Audio de una pestaña';sendTitle();
+    $('now').textContent='Audio de una pestaña';bcast({m:'audio',t:'Audio de una pestaña'});
     status('Audio de la pestaña listo. Tú lo oyes directamente en tu PC.','ok');
   }catch(e){status('No se pudo capturar la pestaña.','bad')}
 };
 
+// ---------- SPOTIFY ----------
+let spApi=null,spReady=null,hostSp=null,guestSp=null,spCur='',lastSp=null,gp=null,spLoading=false;
+window.onSpotifyIframeApiReady=a=>{spApi=a;if(spReady){const f=spReady;spReady=null;f()}};
+function mkSp(el,uri,cb){
+  const go=()=>spApi.createController(el,{uri,width:'100%',height:152},cb);
+  if(spApi)return go();spReady=go;
+  if(!$('spjs')){const s=document.createElement('script');s.id='spjs';s.src='https://open.spotify.com/embed/iframe-api/v1';s.async=true;document.body.appendChild(s)}
+}
+function parseSp(v){
+  const m=/spotify\.com\/(?:intl-[a-z]+\/)?(track|album|playlist|episode|show|artist)\/([A-Za-z0-9]+)/.exec(v)||/spotify:(track|album|playlist|episode|show|artist):([A-Za-z0-9]+)/.exec(v);
+  return m?'spotify:'+m[1]+':'+m[2]:null;
+}
+function setMode(m){
+  const sp=m==='sp';$('tabA').classList.toggle('sel',!sp);$('tabS').classList.toggle('sel',sp);
+  $('audioPanel').classList.toggle('hide',sp);$('spPanel').classList.toggle('hide',!sp);
+  if(sp){$('player').pause();bcast({m:'sp',u:spCur,p:true,t:0})}
+  else{if(hostSp)hostSp.pause();bcast({m:'audio',t:$('now').textContent==='Nada en reproducción'?'':$('now').textContent})}
+}
+$('tabA').onclick=()=>setMode('audio');
+$('tabS').onclick=()=>{setMode('sp');if(!spCur)status('Pega un enlace de Spotify y pulsa «Cargar en los dos».')};
+$('spGo').onclick=()=>{
+  const u=parseSp($('spIn').value);
+  if(!u)return status('Pega un enlace de Spotify: canción, álbum o lista.','bad');
+  spCur=u;setTitle('Spotify');
+  if(hostSp){hostSp.loadUri(u);bcast({m:'sp',u,p:true,t:0});return}
+  mkSp($('spHostEl'),u,c=>{
+    hostSp=c;
+    c.addListener('playback_update',e=>{const d=e.data;if(d.playingURI)spCur=d.playingURI;bcast({m:'sp',u:spCur,p:d.isPaused,t:d.position})});
+  });
+  bcast({m:'sp',u,p:true,t:0});
+};
+
 // ---------- INVITADA ----------
-function openGuest(prefill){
+function guestMode(m){$('gAudio').classList.toggle('hide',m==='sp');$('gSp').classList.toggle('hide',m!=='sp')}
+function applySp(d){
+  lastSp=d;
+  if(!guestSp){
+    if(!spLoading){spLoading=true;spCur=d.u;mkSp($('spGuestEl'),d.u,c=>{guestSp=c;c.addListener('playback_update',e=>{gp=e.data});setTimeout(()=>{if(lastSp&&!lastSp.p)c.play()},1500)})}
+    return;
+  }
+  if(d.u&&d.u!==spCur){spCur=d.u;guestSp.loadUri(d.u);setTimeout(()=>{if(lastSp&&!lastSp.p){guestSp.play();guestSp.seek(lastSp.t/1000)}},1500);return}
+  if(gp&&gp.isPaused!==d.p){d.p?guestSp.pause():guestSp.resume()}
+  if(gp&&!d.p&&Math.abs(gp.position-d.t)>2500)guestSp.seek(d.t/1000);
+}
+function onMsg(d){
+  if(!d)return;
+  if(d.m==='audio'){guestMode('audio');if(guestSp)guestSp.pause();$('title').textContent=d.t||'…';setTitle(d.t)}
+  else if(d.m==='sp'){guestMode('sp');$('title').textContent='Spotify';setTitle('Spotify');if(d.u)applySp(d)}
+}
+function openGuest(pre){
   show('guest');
-  if(prefill){$('codeIn').value=prefill;status('Pulsa «Escuchar» para entrar en la sala.')}
-  else status('Escribe el código de 5 letras.');
+  if(pre){$('codeIn').value=pre;status('Pulsa «Escuchar» para entrar en la sala.')}else status('Escribe el código de 5 letras.');
 }
 $('pickGuest').onclick=()=>openGuest('');
 $('codeIn').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'')};
@@ -234,8 +402,7 @@ $('join').onclick=()=>{
   const code=$('codeIn').value.trim().toUpperCase();
   if(code.length!==5)return status('El código tiene 5 letras o números.','bad');
   status('Conectando…');$('join').disabled=true;
-  if(peer)peer.destroy();
-  peer=new Peer();
+  if(peer)peer.destroy();peer=new Peer();
   peer.on('call',call=>{
     call.answer(undefined,{sdpTransform:hq});
     call.on('stream',s=>{
@@ -243,24 +410,19 @@ $('join').onclick=()=>{
       $('joinCard').classList.add('hide');$('listen').classList.remove('hide');
       a.play().catch(()=>$('tapPlay').classList.remove('hide'));
       try{const c=new (window.AudioContext||window.webkitAudioContext)();viz(c.createMediaStreamSource(s),c)}catch(e){}
-      toggleOn(true);keepAwake();status('Conectada. Ya se oye en tus auriculares.','ok');
+      toggleOn(true);keepAwake();status('Conectada. Ya suena en tus auriculares.','ok');
     });
     call.on('close',()=>{toggleOn(false);status('La sala se cerró.','bad')});
   });
   peer.on('open',()=>{
     const c=peer.connect('duo-'+code,{reliable:true});
-    c.on('data',d=>{if(d&&d.t!==undefined)$('title').textContent=d.t||'…'});
+    c.on('data',onMsg);
     c.on('close',()=>{toggleOn(false);status('El anfitrión cerró la sala.','bad')});
-    setTimeout(()=>{if(!document.body.classList.contains('on')&&$('join').disabled){status('No hay respuesta. Comprueba el código y que el anfitrión tenga la sala abierta.','bad');$('join').disabled=false}},12000);
+    setTimeout(()=>{if(!document.body.classList.contains('on')&&$('join').disabled){status('No hay respuesta. Comprueba el código y que la sala siga abierta.','bad');$('join').disabled=false}},12000);
   });
-  peer.on('error',e=>{
-    $('join').disabled=false;
-    status(e.type==='peer-unavailable'?'No existe esa sala. Revisa el código.':'Error de conexión ('+e.type+').','bad');
-  });
+  peer.on('error',e=>{$('join').disabled=false;status(e.type==='peer-unavailable'?'No existe esa sala. Revisa el código.':'Error de conexión ('+e.type+').','bad')});
 };
 $('tapPlay').onclick=()=>{$('remote').play();$('tapPlay').classList.add('hide')};
-
-// enlace directo ?sala=XXXXX
 {const m=/[?&]sala=([A-Za-z0-9]{5})/.exec(location.search);if(m)openGuest(m[1].toUpperCase())}
 </script>
 </body>
