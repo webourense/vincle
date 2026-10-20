@@ -1,1243 +1,213 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Vinclechat · SmallWebs Premium</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <style>
-    :root {
-      --ink: #0a0a0b;
-      --ink-2: #3c3c43;
-      --ink-3: #8e8e96;
-      --ink-4: #c7c7cc;
-      --accent: #0066cc;
-      --accent-hover: #004499;
-      --accent-2: #30d158;
-      --ai: #6e3fce;
-      --ai-light: rgba(110,63,206,0.07);
-      --ai-border: rgba(110,63,206,0.18);
-      --surface: #f5f5f7;
-      --card: #ffffff;
-      --card-2: #fafafa;
-      --border: rgba(0,0,0,0.08);
-      --border-strong: rgba(0,0,0,0.13);
-      --radius: 22px;
-      --radius-sm: 14px;
-      --radius-xs: 10px;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow: 0 4px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-      --shadow-lg: 0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
-      --font-display: 'Instrument Serif', Georgia, serif;
-      --font-body: 'Instrument Sans', -apple-system, sans-serif;
-    }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-    body {
-      background: var(--surface);
-      font-family: var(--font-body);
-      color: var(--ink);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── CURSOR ── */
-    .cursor { position:fixed; width:8px; height:8px; background:var(--accent); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform 0.06s ease, width 0.18s ease, height 0.18s ease; }
-    .cursor-ring { position:fixed; width:32px; height:32px; border:1px solid rgba(0,102,204,0.3); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:left 0.14s ease, top 0.14s ease, width 0.25s ease, height 0.25s ease, opacity 0.2s ease; }
-    body.cursor-hover .cursor { width:16px; height:16px; }
-    body.cursor-hover .cursor-ring { width:44px; height:44px; opacity:0.5; }
-
-    /* ── NAVBAR ── */
-    .navbar {
-      position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
-      z-index: 200; width: calc(100% - 40px); max-width: 900px;
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(28px) saturate(1.9);
-      -webkit-backdrop-filter: blur(28px) saturate(1.9);
-      border: 1px solid rgba(255,255,255,0.7);
-      border-radius: 100px;
-      box-shadow: 0 8px 28px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.9) inset;
-      padding: 0.55rem 0.7rem 0.55rem 1rem;
-      display: flex; align-items: center; justify-content: space-between;
-      animation: slideDown 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-    @keyframes slideDown { from{opacity:0;transform:translateX(-50%) translateY(-16px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
-
-    .logo {
-      display: flex; align-items: center; gap: 9px;
-      font-family: var(--font-body); font-weight: 700;
-      font-size: 1rem; color: var(--ink); letter-spacing: -0.03em;
-    }
-    .logo-icon {
-      width: 32px; height: 32px;
-      background: var(--ink); border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-
-    /* ELEPHANT SVG icon */
-    .elephant-svg { width: 20px; height: 20px; }
-
-    .nav-pill {
-      background: var(--ink); color: white;
-      padding: 0.5rem 1.1rem; border-radius: 100px;
-      font-size: 0.8rem; font-weight: 600; border: none;
-      cursor: pointer; transition: all 0.2s ease; letter-spacing: -0.01em;
-    }
-    .nav-pill:hover { background: var(--accent); transform: scale(0.97); }
-
-    /* ── HERO ── */
-    .hero {
-      padding: 150px 24px 80px;
-      text-align: center; position: relative; overflow: hidden;
-    }
-    .hero-noise {
-      position: absolute; inset: 0; pointer-events: none; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
-      opacity: 0.4;
-    }
-    .hero-gradient {
-      position: absolute; inset: 0; pointer-events: none;
-      background: radial-gradient(ellipse 80% 60% at 15% -5%, rgba(0,102,204,0.055) 0%, transparent 65%),
-                  radial-gradient(ellipse 60% 50% at 85% 10%, rgba(110,63,206,0.04) 0%, transparent 65%),
-                  radial-gradient(ellipse 50% 40% at 50% 100%, rgba(48,209,88,0.03) 0%, transparent 60%);
-    }
-    .hero > * { position: relative; z-index: 1; }
-
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: rgba(0,102,204,0.07); border: 1px solid rgba(0,102,204,0.13);
-      color: var(--accent); padding: 0.35rem 0.9rem; border-radius: 100px;
-      font-size: 0.73rem; font-weight: 600; margin-bottom: 1.4rem;
-      letter-spacing: 0.04em; text-transform: uppercase;
-      animation: fadeUp 0.8s 0.2s both;
-    }
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(2.8rem, 7.5vw, 5.8rem);
-      line-height: 1.0; letter-spacing: -0.02em;
-      margin-bottom: 1.1rem; animation: fadeUp 0.8s 0.35s both;
-    }
-    .hero-title em {
-      font-style: italic;
-      background: linear-gradient(135deg, #0066cc 0%, #30d158 100%);
-      background-clip: text; -webkit-background-clip: text; color: transparent;
-    }
-    .hero-sub {
-      font-size: 1.05rem; color: var(--ink-3); max-width: 440px;
-      margin: 0 auto 2.2rem; line-height: 1.65;
-      animation: fadeUp 0.8s 0.5s both;
-    }
-    .hero-cta {
-      display: inline-flex; align-items: center; gap: 9px;
-      background: var(--ink); color: white;
-      padding: 0.95rem 1.8rem; border-radius: 100px;
-      font-weight: 600; font-size: 0.92rem; border: none; cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-      animation: fadeUp 0.8s 0.65s both; letter-spacing: -0.01em;
-    }
-    .hero-cta:hover { transform: scale(1.03); background: var(--accent); box-shadow: 0 10px 28px rgba(0,102,204,0.28); }
-    .hero-cta .arrow { transition: transform 0.2s; display: inline-block; }
-    .hero-cta:hover .arrow { transform: translateX(3px); }
-
-    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-
-    .hero-stats {
-      display: flex; align-items: center; justify-content: center;
-      gap: 2.2rem; margin-top: 2.8rem; animation: fadeUp 0.8s 0.8s both;
-    }
-    .stat { text-align: center; }
-    .stat-number { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.04em; }
-    .stat-label { font-size: 0.68rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
-    .stat-sep { width: 1px; height: 36px; background: var(--border-strong); }
-
-    /* Mockup */
-    .hero-mockup { margin: 3rem auto 0; max-width: 640px; animation: fadeUp 0.9s 0.9s both; }
-    .mockup-frame {
-      background: white; border-radius: 20px;
-      border: 1px solid var(--border); box-shadow: var(--shadow-lg);
-      overflow: hidden; transform: perspective(1100px) rotateX(4deg);
-      transition: transform 0.5s ease;
-    }
-    .mockup-frame:hover { transform: perspective(1100px) rotateX(0deg); }
-    .mockup-bar {
-      background: #f2f2f4; padding: 0.65rem 0.9rem;
-      display: flex; align-items: center; gap: 7px;
-      border-bottom: 1px solid var(--border);
-    }
-    .mockup-dot { width: 9px; height: 9px; border-radius: 50%; }
-    .mockup-dot:nth-child(1){background:#ff5f57} .mockup-dot:nth-child(2){background:#febc2e} .mockup-dot:nth-child(3){background:#28c840}
-    .mockup-url {
-      background: white; border-radius: 5px; padding: 0.2rem 0.7rem;
-      font-size: 0.68rem; color: var(--ink-3); flex: 1; text-align: center;
-    }
-    .mockup-content { padding: 1.2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; min-height: 160px; }
-    .mockup-block { background: var(--surface); border-radius: 13px; padding: 0.9rem; }
-    .mockup-block-title { font-size: 0.7rem; font-weight: 600; margin-bottom: 0.45rem; color: var(--ink-2); }
-    .mockup-line { height: 7px; background: #e5e5ea; border-radius: 3px; margin-bottom: 5px; }
-    .mockup-line.short { width: 58%; }
-    .mockup-line.accent { background: rgba(0,102,204,0.18); }
-
-    /* ── CONTAINER ── */
-    .container { max-width: 680px; margin: 0 auto; padding: 0 22px 80px; }
-    .section-label {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.1em; color: var(--ink-4); margin-bottom: 1.1rem;
-    }
-    .section-label::before, .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
-
-    /* ── CARD ── */
-    .card {
-      background: var(--card); border-radius: var(--radius);
-      border: 1px solid var(--border); box-shadow: var(--shadow);
-      padding: 1.8rem; transition: box-shadow 0.3s ease;
-      position: relative; overflow: hidden;
-    }
-    .card::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
-    }
-
-    /* ── FORM ── */
-    .form-group { margin-bottom: 1.2rem; }
-    label {
-      display: flex; align-items: center; gap: 7px;
-      font-weight: 500; font-size: 0.8rem; color: var(--ink-2);
-      margin-bottom: 0.4rem; letter-spacing: -0.01em;
-    }
-    label i { width: 16px; color: var(--accent); font-size: 0.7rem; }
-    input, textarea, select {
-      width: 100%; padding: 0.8rem 0.95rem;
-      border: 1px solid #d1d1d6; border-radius: var(--radius-sm);
-      font-size: 0.92rem; font-family: var(--font-body);
-      background: #fafafc; color: var(--ink);
-      transition: all 0.2s ease; -webkit-appearance: none;
-    }
-    input:focus, textarea:focus, select:focus {
-      outline: none; border-color: var(--accent);
-      background: white; box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-    }
-    input::placeholder, textarea::placeholder { color: #b8b8bf; }
-    textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
-    .input-wrap { position: relative; }
-    .char-count { position: absolute; bottom: 9px; right: 11px; font-size: 0.65rem; color: var(--ink-4); pointer-events: none; }
-    input[type="color"] { height: 44px; padding: 3px 5px; cursor: pointer; border-radius: 10px; }
-    input[type="file"] { padding: 0.55rem; font-size: 0.8rem; cursor: pointer; }
-    .select-wrap { position: relative; }
-    .select-wrap::after {
-      content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      font-size: 0.65rem; color: var(--ink-3); pointer-events: none;
-    }
-    .select-wrap select { padding-right: 2.2rem; }
-
-    /* ── LABEL ROW ── */
-    .label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; }
-    .label-row label { margin-bottom: 0; }
-
-    /* ── BTN AI ── */
-    .btn-ai {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: var(--ai-light); border: 1px solid var(--ai-border);
-      color: var(--ai); padding: 0.28rem 0.7rem; border-radius: 100px;
-      font-size: 0.69rem; font-weight: 600; font-family: var(--font-body);
-      cursor: pointer; transition: all 0.18s ease;
-      letter-spacing: -0.01em; white-space: nowrap; flex-shrink: 0;
-    }
-    .btn-ai:hover:not(:disabled) { background: var(--ai); color: white; border-color: var(--ai); transform: scale(0.97); }
-    .btn-ai:disabled { opacity: 0.45; cursor: not-allowed; }
-
-    /* ── AI SUGGESTIONS ── */
-    .ai-suggestions {
-      background: linear-gradient(135deg, #faf6ff 0%, #f3ebff 100%);
-      border: 1px solid var(--ai-border); border-radius: var(--radius-sm);
-      padding: 0.9rem 1.1rem; margin-top: 0.45rem;
-      animation: fadeUp 0.25s ease; display: none;
-    }
-    .ai-suggestions.visible { display: block; }
-    .ai-suggestions-title {
-      font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.06em; color: var(--ai); margin-bottom: 0.6rem;
-      display: flex; align-items: center; gap: 5px;
-    }
-    .ai-option {
-      background: white; border: 1px solid rgba(110,63,206,0.13);
-      border-radius: 9px; padding: 0.65rem 0.85rem; margin-bottom: 0.45rem;
-      font-size: 0.83rem; line-height: 1.5; cursor: pointer;
-      transition: all 0.18s ease; color: var(--ink-2); position: relative;
-    }
-    .ai-option:hover { border-color: var(--ai); background: #faf6ff; transform: translateX(2px); }
-    .ai-option:hover::after { content: '← usar'; position: absolute; right: 9px; top: 50%; transform: translateY(-50%); font-size: 0.62rem; color: var(--ai); font-weight: 700; }
-    .ai-option:last-child { margin-bottom: 0; }
-    .ai-loading { display: flex; align-items: center; gap: 9px; font-size: 0.8rem; color: var(--ai); padding: 0.4rem 0; }
-    .ai-dots span {
-      display: inline-block; width: 5px; height: 5px; background: var(--ai);
-      border-radius: 50%; animation: aiDot 1.2s ease-in-out infinite; margin: 0 2px;
-    }
-    .ai-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .ai-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes aiDot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
-
-    /* ── AI IMPROVE BANNER ── */
-    .ai-improve-banner {
-      background: linear-gradient(135deg, #170a2e 0%, #2e0f5c 50%, #170a2e 100%);
-      border-radius: 18px; padding: 1.1rem 1.3rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-      margin-bottom: 1.4rem; position: relative; overflow: hidden;
-    }
-    .ai-improve-banner::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse 55% 75% at 78% 50%, rgba(110,63,206,0.45) 0%, transparent 68%);
-    }
-    .ai-improve-banner::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-    }
-    .ai-improve-banner-text { position: relative; }
-    .ai-improve-banner-text strong { display: block; color: white; font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
-    .ai-improve-banner-text span { color: rgba(255,255,255,0.5); font-size: 0.72rem; }
-    .btn-ai-improve {
-      position: relative; display: inline-flex; align-items: center; gap: 7px;
-      background: white; color: var(--ai); padding: 0.55rem 1.1rem;
-      border-radius: 100px; font-size: 0.77rem; font-weight: 700;
-      font-family: var(--font-body); border: none; cursor: pointer;
-      transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;
-    }
-    .btn-ai-improve:hover:not(:disabled) { transform: scale(0.97); box-shadow: 0 6px 20px rgba(110,63,206,0.4); }
-    .btn-ai-improve:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* ── MODAL ── */
-    .ai-modal-overlay {
-      position: fixed; inset: 0; z-index: 500;
-      background: rgba(0,0,0,0.45); backdrop-filter: blur(10px);
-      display: flex; align-items: center; justify-content: center; padding: 20px;
-      opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
-    }
-    .ai-modal-overlay.visible { opacity: 1; pointer-events: all; }
-    .ai-modal {
-      background: white; border-radius: 26px; max-width: 540px; width: 100%;
-      box-shadow: 0 40px 100px rgba(0,0,0,0.22);
-      overflow: hidden; transform: translateY(16px) scale(0.97);
-      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .ai-modal-overlay.visible .ai-modal { transform: translateY(0) scale(1); }
-    .ai-modal-header {
-      background: linear-gradient(135deg, #170a2e 0%, #2e0f5c 100%);
-      padding: 1.4rem 1.4rem 1.1rem; position: relative;
-    }
-    .ai-modal-header h3 { color: white; font-size: 1.05rem; font-weight: 700; margin-bottom: 3px; }
-    .ai-modal-header p { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
-    .ai-modal-close {
-      position: absolute; top: 0.9rem; right: 0.9rem;
-      background: rgba(255,255,255,0.1); border: none; color: white;
-      width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; transition: background 0.2s;
-    }
-    .ai-modal-close:hover { background: rgba(255,255,255,0.2); }
-    .ai-modal-body { padding: 1.4rem; max-height: 70vh; overflow-y: auto; }
-    .ai-result-section { margin-bottom: 0.9rem; }
-    .ai-result-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ai); margin-bottom: 0.35rem; }
-    .ai-result-content {
-      background: #faf6ff; border: 1px solid var(--ai-border);
-      border-radius: 11px; padding: 0.8rem 0.95rem;
-      font-size: 0.85rem; line-height: 1.6; color: var(--ink-2); white-space: pre-wrap;
-    }
-    .ai-modal-actions { display: flex; gap: 7px; margin-top: 1.1rem; }
-    .btn-modal-apply { flex:1; padding:0.8rem; background:var(--ai); color:white; border:none; border-radius:100px; font-family:var(--font-body); font-weight:700; font-size:0.85rem; cursor:pointer; transition:all 0.2s; }
-    .btn-modal-apply:hover { background:#5b31b0; }
-    .btn-modal-cancel { padding:0.8rem 1.1rem; background:#f2f2f7; color:var(--ink-2); border:none; border-radius:100px; font-family:var(--font-body); font-weight:600; font-size:0.85rem; cursor:pointer; transition:all 0.2s; }
-    .btn-modal-cancel:hover { background:#e5e5ea; }
-
-    /* ── EXPAND ── */
-    .btn-expand {
-      width: 100%; padding: 0.8rem; background: transparent;
-      border: 1px dashed #c8c8d0; border-radius: var(--radius-sm);
-      color: var(--accent); font-family: var(--font-body); font-weight: 500;
-      font-size: 0.85rem; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; gap: 7px;
-      transition: all 0.2s ease; margin-top: 0.4rem;
-    }
-    .btn-expand:hover { background: rgba(0,102,204,0.04); border-color: var(--accent); }
-    .btn-expand i { transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1); }
-    .btn-expand.open i { transform: rotate(180deg); }
-    .expandable { max-height: 0; overflow: hidden; transition: max-height 0.55s cubic-bezier(0.33,1,0.68,1), opacity 0.35s ease; opacity: 0; }
-    .expandable.open { max-height: 3000px; opacity: 1; }
-    .divider { border: none; border-top: 1px solid var(--border); margin: 1.3rem 0; }
-    .subsection-title {
-      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--ink-3); margin-bottom: 0.9rem;
-      display: flex; align-items: center; gap: 7px;
-    }
-    .subsection-title i { color: var(--accent); }
-    .colors-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
-    .logo-preview-wrap { display: flex; align-items: center; gap: 11px; margin-top: 7px; }
-    .logo-preview-wrap img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); box-shadow: var(--shadow-sm); }
-    .logo-hint { font-size: 0.72rem; color: var(--ink-3); line-height: 1.4; }
-
-    /* ── PROGRESS ── */
-    .form-progress { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.8rem; position: relative; }
-    .form-progress::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); z-index: 0; transform: translateY(-50%); }
-    .progress-step { display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; z-index: 1; }
-    .step-dot {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: #e5e5ea; color: var(--ink-3);
-      font-size: 0.67rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.28s ease;
-    }
-    .step-dot.active { background: var(--accent); color: white; box-shadow: 0 3px 10px rgba(0,102,204,0.28); }
-    .step-dot.done { background: var(--accent-2); color: white; }
-    .step-label { font-size: 0.6rem; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
-
-    /* ── BTN PRIMARY ── */
-    .btn-primary {
-      width: 100%; padding: 1rem 1.4rem;
-      background: var(--ink); color: white; border: none; border-radius: 100px;
-      font-family: var(--font-body); font-size: 0.92rem; font-weight: 600;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      gap: 9px; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-      margin-top: 1.4rem; letter-spacing: -0.01em;
-      position: relative; overflow: hidden;
-    }
-    .btn-primary::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .btn-primary:hover:not(:disabled) { transform: scale(0.98) translateY(-1px); background: var(--accent); box-shadow: 0 14px 36px rgba(0,102,204,0.28); }
-    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
-    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: white; border-radius: 50%; animation: spin 0.65s linear infinite; }
-    @keyframes spin { to{transform:rotate(360deg)} }
-
-    /* ── RESULT ── */
-    .result-card {
-      margin-top: 1.1rem; padding: 1.1rem 1.3rem;
-      background: linear-gradient(135deg, #f0fdf5 0%, #dcfce7 100%);
-      border-radius: var(--radius-sm); border-left: 3px solid var(--accent-2);
-      animation: fadeUp 0.35s ease;
-    }
-    .result-card h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
-    .result-url { font-size: 0.75rem; color: var(--accent); word-break: break-all; text-decoration: none; }
-    .result-url:hover { text-decoration: underline; }
-    .result-actions { display: flex; gap: 7px; margin-top: 0.75rem; flex-wrap: wrap; }
-    .btn-sm { padding: 0.42rem 0.95rem; border-radius: 100px; font-size: 0.75rem; font-weight: 600; font-family: var(--font-body); cursor: pointer; border: none; transition: all 0.18s; }
-    .btn-sm.primary { background: var(--accent); color: white; }
-    .btn-sm.secondary { background: #e5e5ea; color: var(--ink); }
-    .btn-sm:hover { opacity: 0.82; transform: scale(0.97); }
-
-    /* ── TESTIMONIAL ── */
-    .testimonial-section { margin: 2.5rem 0; }
-    .testimonial-card {
-      background: var(--ink); border-radius: var(--radius); padding: 2.2rem;
-      position: relative; overflow: hidden; color: white;
-    }
-    .testimonial-card::before {
-      content: '"'; position: absolute; top: -24px; left: 16px;
-      font-family: var(--font-display); font-size: 11rem; color: rgba(255,255,255,0.035);
-      line-height: 1; pointer-events: none;
-    }
-    .testimonial-text { font-family: var(--font-display); font-size: 1.25rem; font-style: italic; line-height: 1.5; margin-bottom: 1.4rem; position: relative; }
-    .testimonial-author { display: flex; align-items: center; gap: 11px; }
-    .author-avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; }
-    .author-name { font-weight: 600; font-size: 0.87rem; }
-    .author-role { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
-    .testimonial-badge { position: absolute; top: 1.3rem; right: 1.3rem; background: rgba(48,209,88,0.14); border: 1px solid rgba(48,209,88,0.28); color: #30d158; padding: 0.25rem 0.75rem; border-radius: 100px; font-size: 0.67rem; font-weight: 600; }
-
-    /* ── MARQUEE ── */
-    .marquee-section { margin: 1.8rem 0; overflow: hidden; }
-    .marquee-label { text-align: center; font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-4); margin-bottom: 0.9rem; }
-    .marquee { position: relative; }
-    .marquee::before, .marquee::after { content: ''; position: absolute; top: 0; bottom: 0; width: 70px; z-index: 2; pointer-events: none; }
-    .marquee::before { left: 0; background: linear-gradient(90deg, var(--surface), transparent); }
-    .marquee::after { right: 0; background: linear-gradient(-90deg, var(--surface), transparent); }
-    .marquee-track { display: inline-flex; gap: 1.3rem; animation: marquee 35s linear infinite; }
-    .marquee-item { display: inline-flex; align-items: center; gap: 7px; background: white; border: 1px solid var(--border); padding: 0.45rem 1.1rem; border-radius: 100px; font-size: 0.77rem; font-weight: 500; white-space: nowrap; box-shadow: var(--shadow-sm); }
-    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-
-    /* ── FOOTER ── */
-    .footer { text-align: center; padding: 1.8rem 1rem; color: var(--ink-4); font-size: 0.72rem; border-top: 1px solid var(--border); margin-top: 2.5rem; }
-
-    /* ── TOAST ── */
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(70px); background: var(--ink); color: white; padding: 0.65rem 1.3rem; border-radius: 100px; font-size: 0.82rem; font-weight: 500; z-index: 1000; transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.14); }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-
-    /* ── PROPOSAL VIEW ── */
-    .proposal-view { min-height: 100vh; background: var(--surface); display: flex; align-items: flex-start; justify-content: center; padding: 40px 20px 80px; }
-    .proposal-card { max-width: 720px; width: 100%; background: white; border-radius: 28px; box-shadow: var(--shadow-lg); overflow: hidden; animation: propIn 0.65s cubic-bezier(0.34,1.56,0.64,1) both; }
-    @keyframes propIn { from{opacity:0;transform:translateY(24px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
-    .proposal-header { padding: 2.2rem 1.8rem 1.4rem; text-align: center; border-bottom: 1px solid var(--border); }
-    .proposal-logo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2.5px solid white; box-shadow: 0 6px 20px rgba(0,0,0,0.1); margin-bottom: 0.9rem; }
-    .proposal-logo-placeholder { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #e5e5ea, #d0d0d8); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.9rem; font-size: 1.8rem; color: #aaa; }
-    .proposal-name { font-size: 0.95rem; font-weight: 600; color: var(--ink); }
-    .proposal-role { font-size: 0.77rem; color: var(--ink-3); margin-top: 2px; }
-    .proposal-title-main { font-family: var(--font-display); font-size: 2rem; letter-spacing: -0.02em; margin: 0.9rem 0 0; color: var(--ink); line-height: 1.1; }
-    .proposal-body { padding: 1.8rem; }
-    .proposal-desc { font-size: 0.93rem; line-height: 1.72; color: var(--ink-2); white-space: pre-wrap; margin-bottom: 1.4rem; }
-    .tags-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 1.4rem; }
-    .tag { display: inline-flex; align-items: center; gap: 5px; background: #f2f2f7; color: var(--ink-2); padding: 0.32rem 0.85rem; border-radius: 100px; font-size: 0.72rem; font-weight: 500; }
-    .tag i { font-size: 0.62rem; color: var(--accent); }
-    .price-block { background: var(--surface); border-radius: 18px; padding: 1.4rem; text-align: center; border: 1px solid var(--border); }
-    .price-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); margin-bottom: 0.35rem; }
-    .price-amount { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.9rem; }
-    .pay-btn { display: inline-flex; align-items: center; gap: 9px; padding: 0.9rem 1.8rem; border-radius: 100px; color: white; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); font-family: var(--font-body); }
-    .pay-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,0.18); }
-    .pay-btn .arrow { transition: transform 0.2s; display: inline-block; }
-    .pay-btn:hover .arrow { transform: translateX(4px); }
-    .proposal-footer { text-align: center; padding: 0.9rem 1.8rem 1.4rem; font-size: 0.62rem; color: #c0c0c8; }
-
-    /* ── RESPONSIVE ── */
-    @media(max-width:640px) {
-      .navbar{top:8px;width:calc(100% - 20px);padding:0.45rem 0.7rem 0.45rem 0.85rem;}
-      .hero{padding:110px 16px 55px;}
-      .hero-stats{gap:1rem;}
-      .hero-mockup{display:none;}
-      .container{padding:0 14px 55px;}
-      .card{padding:1.3rem;border-radius:18px;}
-      .colors-grid{grid-template-columns:1fr 1fr;}
-      .proposal-title-main{font-size:1.5rem;}
-      .price-amount{font-size:2rem;}
-      .proposal-body{padding:1.1rem;}
-      .proposal-header{padding:1.3rem 1.1rem 1.1rem;}
-      .cursor,.cursor-ring{display:none;}
-      .form-progress{display:none;}
-      .ai-improve-banner{flex-direction:column;align-items:flex-start;}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dúo – dos auriculares, una canción</title>
+<style>
+:root{--bg:#141a2e;--panel:#1d2540;--line:#34406a;--txt:#eef0fa;--mut:#9aa3c7;--a:#7fd6c2;--b:#b9a6ff;--err:#ff8f9c;color-scheme:dark}
+@media(prefers-color-scheme:light){:root{--bg:#f2f3fa;--panel:#fff;--line:#cfd4ea;--txt:#1a2140;--mut:#5b6590;--a:#1f9c84;--b:#6a54d6;--err:#c93a4d;color-scheme:light}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--txt);font:16px/1.5 "Gill Sans","Trebuchet MS",Verdana,sans-serif;padding:20px 16px 48px}
+main{max-width:560px;margin:0 auto}
+h1{font-size:1.9rem;margin:8px 0 4px;letter-spacing:-.01em}
+p{margin:0 0 12px}
+.mut{color:var(--mut);font-size:.92rem}
+.rings{display:block;margin:6px auto 0;width:150px;height:auto}
+.rings circle{fill:none;stroke-width:6}
+.rings .r1{stroke:var(--a)}.rings .r2{stroke:var(--b)}
+body.on .rings circle{animation:pulse 1.6s ease-in-out infinite}
+body.on .rings .r2{animation-delay:.8s}
+@keyframes pulse{50%{stroke-width:11}}
+@media(prefers-reduced-motion:reduce){body.on .rings circle{animation:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+button,.btn{font:inherit;color:var(--txt);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;cursor:pointer;text-align:center}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+button.main{background:var(--a);color:#0d1a17;border-color:var(--a);font-weight:700}
+button.alt{background:var(--b);color:#16102f;border-color:var(--b);font-weight:700}
+button:disabled{opacity:.5;cursor:default}
+.choose button{padding:16px 10px;font-weight:700}
+textarea{width:100%;height:84px;background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px;font:12px/1.3 monospace;resize:vertical}
+label{display:block;margin:12px 0 6px;font-weight:700}
+input[type=range]{width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.step{font-weight:700;margin:0 0 6px}
+#status{padding:10px 14px;border-radius:10px;border:1px solid var(--line);margin:14px 0;font-size:.95rem}
+#status.ok{border-color:var(--a)}#status.bad{border-color:var(--err);color:var(--err)}
+audio{width:100%;margin-top:10px}
+details{margin-top:18px}summary{cursor:pointer;font-weight:700}
+.hide{display:none}
+</style>
 </head>
 <body>
+<main>
+<svg class="rings" viewBox="0 0 150 80" aria-hidden="true"><circle class="r1" cx="52" cy="40" r="28"/><circle class="r2" cx="98" cy="40" r="28"/></svg>
+<h1>Dúo</h1>
+<p class="mut">Una canción en dos móviles a la vez, cada uno con sus auriculares Bluetooth. El audio viaja de móvil a móvil directamente, sin servidor.</p>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
+<div id="status" role="status">Elige tu papel para empezar.</div>
 
-<!-- Navbar -->
-<nav class="navbar" id="mainNavbar">
-  <div class="logo">
-    <div class="logo-icon">
-      <!-- Elephant SVG -->
-      <svg class="elephant-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8.5 3C6.5 3 4 4.5 4 7.5C4 9 4.5 10.5 5.5 11.5C4.5 12 3 13 3 15.5C3 17.5 4.5 19 6 19.5V21H8V19.5C8.8 19.7 9.5 19.8 10.5 19.8C12.5 19.8 14 19 15 17.8V21H17V17.5C18.5 16.5 20 14.8 20 12.5C20 10.5 19 9 17.5 8.2C18 7.5 18.5 6.5 18.5 5.5C18.5 4 17.5 3 16 3C14.8 3 14 3.8 13.7 4.8C12.8 4.3 11.7 4 10.5 4C9.7 4 9 4.2 8.5 4.5V3Z" fill="white" opacity="0.9"/>
-        <circle cx="8.5" cy="8" r="1" fill="#0a0a0b"/>
-        <path d="M5.5 16C5.5 15 6.5 14.5 7.5 14.5" stroke="#0a0a0b" stroke-width="0.8" stroke-linecap="round"/>
-      </svg>
-    </div>
-    Vinclechat
+<div class="choose" id="choose">
+  <button id="pickHost">Pongo la música</button>
+  <button id="pickGuest">Quiero escuchar</button>
+</div>
+
+<!-- ANFITRIÓN -->
+<section id="host" class="hide">
+  <div class="card">
+    <p class="step">1. Elige la música</p>
+    <input type="file" id="files" accept="audio/*" multiple>
+    <audio id="player" controls></audio>
+    <div class="row"><button id="tabCap" class="hide">Compartir audio de una pestaña (PC)</button></div>
+    <p class="mut" style="margin-top:10px">Spotify no se puede capturar desde el móvil: usa archivos de audio tuyos (mp3, m4a, wav).</p>
   </div>
-  <button class="nav-pill" onclick="document.querySelector('.card').scrollIntoView({behavior:'smooth'})">
-    Crear SmallWeb ✦
-  </button>
-</nav>
-
-<!-- Hero -->
-<section class="hero" id="homeHero">
-  <div class="hero-noise"></div>
-  <div class="hero-gradient"></div>
-
-  <div class="hero-eyebrow"><i class="fas fa-bolt"></i> La forma fácil de hacer propuestas</div>
-  <h1 class="hero-title">Lo sencillo,<br><em>vende.</em></h1>
-  <p class="hero-sub">Crea SmallWebs impecables en segundos. Sin registro. Sin diseñador. Sin perder el tiempo.</p>
-  <button class="hero-cta" onclick="document.querySelector('.card').scrollIntoView({behavior:'smooth'})">
-    <i class="fas fa-magic"></i> Crear mi SmallWeb ahora <span class="arrow">→</span>
-  </button>
-  <div class="hero-stats">
-    <div class="stat"><div class="stat-number" id="counter1">—</div><div class="stat-label">SmallWebs creadas</div></div>
-    <div class="stat-sep"></div>
-    <div class="stat"><div class="stat-number">2 min</div><div class="stat-label">Tiempo promedio</div></div>
-    <div class="stat-sep"></div>
-    <div class="stat"><div class="stat-number">100%</div><div class="stat-label">Sin registro</div></div>
+  <div class="card">
+    <p class="step">2. Crea tu código y envíaselo</p>
+    <div class="row"><button id="mkOffer" class="main">Crear código</button></div>
+    <textarea id="offerOut" readonly placeholder="Aquí aparecerá tu código" class="hide"></textarea>
+    <div class="row hide" id="offerBtns"><button data-copy="offerOut">Copiar</button><button data-share="offerOut">Enviar por WhatsApp…</button></div>
   </div>
-  <div class="hero-mockup">
-    <div class="mockup-frame">
-      <div class="mockup-bar">
-        <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
-        <div class="mockup-url">vinclechat.app/p/abc123</div>
-      </div>
-      <div class="mockup-content">
-        <div class="mockup-block">
-          <div class="mockup-block-title">Aceleración Comercial 2025</div>
-          <div class="mockup-line"></div><div class="mockup-line short"></div>
-          <div class="mockup-line accent"></div><div class="mockup-line short accent"></div>
-        </div>
-        <div class="mockup-block" style="background:#0066cc;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-          <div style="color:rgba(255,255,255,0.65);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.07em;">Inversión</div>
-          <div style="color:white;font-size:1.4rem;font-weight:800;letter-spacing:-0.03em;">2.890€</div>
-          <div style="background:rgba(255,255,255,0.18);color:white;padding:0.28rem 0.75rem;border-radius:20px;font-size:0.65rem;font-weight:600;margin-top:0.45rem;">Pagar ahora →</div>
-        </div>
-      </div>
-    </div>
+  <div class="card">
+    <p class="step">3. Pega su código de respuesta</p>
+    <textarea id="answerIn" placeholder="Pega aquí el código que te devuelva"></textarea>
+    <div class="row"><button id="connect" class="alt">Conectar</button></div>
+  </div>
+  <div class="card">
+    <label for="dly">Ajustar sincronía: mi retraso <span id="dlyV">200</span> ms</label>
+    <input type="range" id="dly" min="0" max="1000" step="10" value="200">
+    <p class="mut">Si la oyes antes que ella, sube el valor. Si la oyes después, bájalo.</p>
   </div>
 </section>
 
-<!-- FORMULARIO -->
-<div id="creatorPanel" class="container">
-  <div class="section-label">Crear SmallWeb</div>
-
+<!-- INVITADA -->
+<section id="guest" class="hide">
   <div class="card">
-    <!-- Progreso -->
-    <div class="form-progress">
-      <div class="progress-step"><div class="step-dot active" id="step1">1</div><div class="step-label">Contenido</div></div>
-      <div class="progress-step"><div class="step-dot" id="step2">2</div><div class="step-label">Perfil</div></div>
-      <div class="progress-step"><div class="step-dot" id="step3">3</div><div class="step-label">Precio</div></div>
-      <div class="progress-step"><div class="step-dot" id="step4">4</div><div class="step-label">Diseño</div></div>
-    </div>
-
-    <!-- Banner IA -->
-    <div class="ai-improve-banner">
-      <div class="ai-improve-banner-text">
-        <strong>✦ Mejorar propuesta con IA</strong>
-        <span>Rellena título y descripción y la IA optimizará todo tu contenido</span>
-      </div>
-      <button class="btn-ai-improve" id="btnImproveAll" onclick="improveAllWithAI()">
-        <i class="fas fa-wand-magic-sparkles"></i> Mejorar todo
-      </button>
-    </div>
-
-    <form id="proposalForm">
-      <!-- Título -->
-      <div class="form-group">
-        <div class="label-row">
-          <label><i class="fas fa-heading"></i> Título de la oferta *</label>
-          <button type="button" class="btn-ai" id="btnAiTitle" onclick="aiSuggestTitle()">
-            <span>✦</span> Sugerir con IA
-          </button>
-        </div>
-        <input type="text" id="title" placeholder="Ej: Aceleración Comercial 2025" required maxlength="80">
-        <div class="ai-suggestions" id="aiTitleSuggestions"></div>
-      </div>
-
-      <!-- Descripción -->
-      <div class="form-group">
-        <div class="label-row">
-          <label><i class="fas fa-align-left"></i> Descripción *</label>
-          <button type="button" class="btn-ai" id="btnAiDesc" onclick="aiSuggestDescription()">
-            <span>✦</span> Generar con IA
-          </button>
-        </div>
-        <div class="input-wrap">
-          <textarea id="description" rows="5" placeholder="• Diagnóstico estratégico&#10;• Implementación ágil&#10;• Soporte 30 días" required maxlength="800"></textarea>
-          <span class="char-count" id="descCount">0/800</span>
-        </div>
-        <div class="ai-suggestions" id="aiDescSuggestions"></div>
-      </div>
-
-      <button type="button" id="toggleExpandBtn" class="btn-expand">
-        <i class="fas fa-chevron-down"></i>
-        Añadir perfil, precio, diseño y más
-      </button>
-
-      <div id="expandableSection" class="expandable" style="margin-top:1.1rem;">
-
-        <hr class="divider">
-        <div class="subsection-title"><i class="fas fa-user-circle"></i> Quién emite la propuesta</div>
-
-        <div class="form-group">
-          <label><i class="fas fa-building"></i> Tipo de emisor</label>
-          <div class="select-wrap">
-            <select id="profileType">
-              <option value="empresa">🏢 Empresa / Agencia</option>
-              <option value="persona">🧑‍💻 Profesional independiente</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="empresaFields">
-          <div class="form-group"><label><i class="fas fa-signature"></i> Nombre de la empresa</label><input type="text" id="empresaNombre" placeholder="Ej: Vincletech Solutions"></div>
-          <div class="form-group"><label><i class="fas fa-info-circle"></i> Breve descripción</label><input type="text" id="empresaDesc" placeholder="Agencia boutique de transformación digital"></div>
-        </div>
-        <div id="personaFields" style="display:none;">
-          <div class="form-group"><label><i class="fas fa-user"></i> Nombre y apellidos</label><input type="text" id="personaNombre" placeholder="Ej: Laura Méndez"></div>
-          <div class="form-group"><label><i class="fas fa-microphone-alt"></i> Descripción profesional</label><input type="text" id="personaDesc" placeholder="Consultora senior en growth"></div>
-        </div>
-
-        <div class="form-group"><label><i class="fas fa-medal"></i> Años de experiencia</label><input type="text" id="experiencia" placeholder="Ej: +8 años en marketing digital"></div>
-
-        <hr class="divider">
-        <div class="subsection-title"><i class="fas fa-briefcase"></i> Detalles del servicio</div>
-
-        <div class="form-group"><label><i class="fas fa-hourglass-half"></i> Duración del servicio</label><input type="text" id="duration" placeholder="Ej: 3 meses / 20 horas"></div>
-        <div class="form-group"><label><i class="fas fa-users"></i> Para quién es (target)</label><input type="text" id="targetAudience" placeholder="Ej: Startups B2B, Autónomos digitales"></div>
-
-        <hr class="divider">
-        <div class="subsection-title"><i class="fas fa-euro-sign"></i> Precio y cobro</div>
-
-        <div class="form-group">
-          <div class="label-row">
-            <label><i class="fas fa-tag"></i> Precio</label>
-            <button type="button" class="btn-ai" id="btnAiPrice" onclick="aiSuggestPrice()">
-              <span>✦</span> Calcular con IA
-            </button>
-          </div>
-          <input type="text" id="price" placeholder="Ej: 2.890€ · o 180€/hora">
-          <div class="ai-suggestions" id="aiPriceSuggestions"></div>
-        </div>
-        <div class="form-group"><label><i class="fas fa-credit-card"></i> Link de pago</label><input type="url" id="paymentLink" placeholder="https://paypal.me/tuempresa"></div>
-
-        <hr class="divider">
-        <div class="subsection-title"><i class="fas fa-palette"></i> Personaliza el look</div>
-
-        <div class="colors-grid">
-          <div class="form-group"><label>Color principal</label><input type="color" id="primaryColor" value="#0066cc"></div>
-          <div class="form-group"><label>Color de fondo</label><input type="color" id="bgColor" value="#ffffff"></div>
-          <div class="form-group"><label>Tipografía</label>
-            <div class="select-wrap">
-              <select id="fontFamily">
-                <option value="'Instrument Sans', sans-serif">Instrument Sans (moderno)</option>
-                <option value="'Georgia', serif">Georgia (clásico)</option>
-                <option value="'Courier New', monospace">Monospace (técnico)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-image"></i> Logo / foto de perfil</label>
-          <input type="file" id="logoUpload" accept="image/*">
-          <div id="logoPreview" class="logo-preview-wrap" style="display:none;"></div>
-        </div>
-
-      </div><!-- fin expandable -->
-
-      <button type="submit" class="btn-primary" id="createBtn">
-        <i class="fas fa-magic"></i> Crear SmallWeb ✦
-      </button>
-    </form>
-
-    <div id="resultArea"></div>
+    <p class="step">1. Pega el código que te han enviado</p>
+    <textarea id="offerIn" placeholder="Pega aquí el código"></textarea>
+    <div class="row"><button id="mkAnswer" class="main">Generar respuesta</button></div>
   </div>
-
-  <!-- TESTIMONIAL -->
-  <div class="testimonial-section">
-    <div class="testimonial-card">
-      <span class="testimonial-badge">✦ Cliente verificado</span>
-      <p class="testimonial-text">"La sencillez de Vinclechat transforma completamente cómo presentamos propuestas. En segundos tienes una SmallWeb profesional, clara y lista para cerrar."</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">🧠</div>
-        <div>
-          <div class="author-name">Juanma Miguel</div>
-          <div class="author-role">CEO · Instituto NeuroSmart</div>
-        </div>
-      </div>
-    </div>
+  <div class="card hide" id="ansCard">
+    <p class="step">2. Devuelve este código</p>
+    <textarea id="answerOut" readonly></textarea>
+    <div class="row"><button data-copy="answerOut">Copiar</button><button data-share="answerOut">Enviar por WhatsApp…</button></div>
   </div>
-
-  <!-- MARQUEE -->
-  <div class="marquee-section">
-    <div class="marquee-label">Empresas que confían</div>
-    <div class="marquee">
-      <div class="marquee-track">
-        <div class="marquee-item"><i class="fas fa-building" style="color:var(--accent)"></i> MundiBusiness</div>
-        <div class="marquee-item"><i class="fas fa-brain" style="color:#ff6b6b"></i> Instituto NeuroSmart</div>
-        <div class="marquee-item"><i class="fas fa-robot" style="color:#30d158"></i> Marikaf-ai</div>
-        <div class="marquee-item"><i class="fas fa-handshake" style="color:#ff9500"></i> KnowMeet</div>
-        <div class="marquee-item"><i class="fas fa-chart-line" style="color:#5856d6"></i> Tu-Economía</div>
-        <div class="marquee-item">✦ +50 aliados</div>
-        <div class="marquee-item"><i class="fas fa-building" style="color:var(--accent)"></i> MundiBusiness</div>
-        <div class="marquee-item"><i class="fas fa-brain" style="color:#ff6b6b"></i> Instituto NeuroSmart</div>
-        <div class="marquee-item"><i class="fas fa-robot" style="color:#30d158"></i> Marikaf-ai</div>
-        <div class="marquee-item"><i class="fas fa-handshake" style="color:#ff9500"></i> KnowMeet</div>
-        <div class="marquee-item"><i class="fas fa-chart-line" style="color:#5856d6"></i> Tu-Economía</div>
-        <div class="marquee-item">✦ +50 aliados</div>
-      </div>
-    </div>
+  <div class="card hide" id="listen">
+    <audio id="remote" controls autoplay playsinline></audio>
+    <div class="row"><button id="tapPlay" class="alt hide">Toca para escuchar</button></div>
   </div>
+</section>
 
-  <div class="footer"><p>© 2025 Vinclechat · Propuestas profesionales hechas con cariño 🐘</p></div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<!-- Modal IA -->
-<div class="ai-modal-overlay" id="aiModalOverlay">
-  <div class="ai-modal">
-    <div class="ai-modal-header">
-      <button class="ai-modal-close" onclick="closeAiModal()"><i class="fas fa-times"></i></button>
-      <h3>✦ Propuesta mejorada con IA</h3>
-      <p>Revisa las mejoras y aplícalas con un clic</p>
-    </div>
-    <div class="ai-modal-body" id="aiModalBody">
-      <div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Analizando tu propuesta...</div>
-    </div>
-  </div>
-</div>
+<details>
+  <summary>Cómo usarlo</summary>
+  <ol class="mut">
+    <li>Cada uno conecta sus auriculares Bluetooth a su propio móvil.</li>
+    <li>Ambos abrís esta página. Uno elige «Pongo la música», la otra «Quiero escuchar».</li>
+    <li>Intercambiad los dos códigos por WhatsApp (uno de ida, otro de vuelta).</li>
+    <li>Dale al play en el móvil anfitrión y ajusta la sincronía con el deslizador.</li>
+  </ol>
+  <p class="mut">Mantened la pantalla encendida y esta pestaña abierta en ambos móviles. Funciona con datos o wifi.</p>
+</details>
+</main>
 
 <script>
-  // ── Firebase ──
-  const firebaseConfig = {
-    apiKey: "AIzaSyBfJq-6CniQvqmR6aRS3XNC5GxE5E1bMpQ",
-    authDomain: "vinclechat-564d1.firebaseapp.com",
-    projectId: "vinclechat-564d1",
-    storageBucket: "vinclechat-564d1.firebasestorage.app",
-    messagingSenderId: "674493693630",
-    appId: "1:674493693630:web:917f85b174047e327028ef"
-  };
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  let currentEditingId = null;
-  let currentLogoBase64 = '';
-
-  // ── Cursor ──
-  const cursor = document.getElementById('cursor');
-  const cursorRing = document.getElementById('cursorRing');
-  if (cursor && cursorRing) {
-    document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
-      setTimeout(() => { cursorRing.style.left = e.clientX + 'px'; cursorRing.style.top = e.clientY + 'px'; }, 80);
-    });
-    document.querySelectorAll('button, a, input, textarea, select').forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-    });
+const $=id=>document.getElementById(id);
+const cfg={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
+let pc,ctx,dest,delay,srcNode,queue=[],qi=0;
+const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+const dec=s=>JSON.parse(decodeURIComponent(escape(atob(s.replace(/\s+/g,'')))));
+const hq=s=>s.replace(/useinbandfec=1/g,'useinbandfec=1;stereo=1;sprop-stereo=1;maxaveragebitrate=192000');
+function status(t,c){const s=$('status');s.textContent=t;s.className=c||''}
+function gathered(p){return new Promise(r=>{if(p.iceGatheringState==='complete')return r();p.addEventListener('icegatheringstatechange',()=>p.iceGatheringState==='complete'&&r());setTimeout(r,4000)})}
+async function keepAwake(){try{await navigator.wakeLock.request('screen')}catch(e){}}
+function watch(p){
+  p.onconnectionstatechange=()=>{
+    const s=p.connectionState;
+    document.body.classList.toggle('on',s==='connected');
+    if(s==='connected'){status('Conectados. Ya se oye en los dos móviles.','ok');keepAwake()}
+    else if(s==='failed'||s==='disconnected')status('Se perdió la conexión. Vuelve a crear los códigos.','bad');
+    else if(s==='connecting')status('Conectando…')
   }
+}
+function show(id){$('choose').classList.add('hide');$(id).classList.remove('hide')}
+$('pickHost').onclick=()=>{show('host');status('Elige música y crea tu código.');if(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia&&!/Android|iPhone|iPad/i.test(navigator.userAgent))$('tabCap').classList.remove('hide')};
+$('pickGuest').onclick=()=>{show('guest');status('Pega el código que te envió quien pone la música.')};
 
-  // ── Counter ──
-  function animateCount(el, target, duration = 1800) {
-    let start = null;
-    const step = ts => {
-      if (!start) start = ts;
-      const p = Math.min((ts - start) / duration, 1);
-      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target).toLocaleString('es-ES');
-      if (p < 1) requestAnimationFrame(step);
+// copiar / compartir
+document.addEventListener('click',async e=>{
+  const c=e.target.dataset.copy,s=e.target.dataset.share;
+  if(c){const t=$(c);t.select();try{await navigator.clipboard.writeText(t.value)}catch(_){document.execCommand('copy')}status('Código copiado.','ok')}
+  if(s){const v=$(s).value;if(navigator.share){try{await navigator.share({text:v})}catch(_){}}else{window.open('https://wa.me/?text='+encodeURIComponent(v))}}
+});
+
+// ----- ANFITRIÓN -----
+function ensureAudio(){
+  if(ctx){ctx.resume();return}
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+  dest=ctx.createMediaStreamDestination();
+  delay=ctx.createDelay(2);delay.delayTime.value=$('dly').value/1000;
+  srcNode=ctx.createMediaElementSource($('player'));
+  srcNode.connect(dest);srcNode.connect(delay);delay.connect(ctx.destination);
+}
+$('files').onchange=e=>{
+  queue=[...e.target.files];qi=0;
+  if(queue.length)$('player').src=URL.createObjectURL(queue[0]);
+};
+$('player').onended=()=>{if(qi+1<queue.length){qi++;$('player').src=URL.createObjectURL(queue[qi]);$('player').play()}};
+$('player').onplay=()=>{if(ctx)ctx.resume()};
+$('dly').oninput=e=>{$('dlyV').textContent=e.target.value;if(delay)delay.delayTime.value=e.target.value/1000};
+$('tabCap').onclick=async()=>{
+  try{
+    ensureAudio();
+    const st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
+    const at=st.getAudioTracks();st.getVideoTracks().forEach(t=>t.stop());
+    if(!at.length){status('Marca «Compartir audio de la pestaña» en el selector.','bad');return}
+    ctx.createMediaStreamSource(new MediaStream(at)).connect(dest);
+    status('Audio de la pestaña listo. Tú lo oyes directamente en tu PC.','ok');
+  }catch(e){status('No se pudo capturar la pestaña.','bad')}
+};
+$('mkOffer').onclick=async()=>{
+  try{
+    ensureAudio();
+    pc=new RTCPeerConnection(cfg);watch(pc);
+    dest.stream.getAudioTracks().forEach(t=>pc.addTrack(t,dest.stream));
+    const o=await pc.createOffer();o.sdp=hq(o.sdp);
+    await pc.setLocalDescription(o);status('Preparando código…');await gathered(pc);
+    $('offerOut').value=enc({s:pc.localDescription.sdp});
+    $('offerOut').classList.remove('hide');$('offerBtns').classList.remove('hide');
+    status('Envía este código y espera su respuesta.');
+  }catch(e){status('Error al crear el código: '+e.message,'bad')}
+};
+$('connect').onclick=async()=>{
+  try{
+    if(!pc)return status('Primero crea tu código (paso 2).','bad');
+    const a=dec($('answerIn').value);
+    await pc.setRemoteDescription({type:'answer',sdp:a.s});
+    pc.getSenders().forEach(s=>{const p=s.getParameters();if(!p.encodings||!p.encodings.length)p.encodings=[{}];p.encodings[0].maxBitrate=192000;s.setParameters(p).catch(()=>{})});
+    status('Conectando…');
+  }catch(e){status('Ese código no es válido. Cópialo entero.','bad')}
+};
+
+// ----- INVITADA -----
+$('mkAnswer').onclick=async()=>{
+  try{
+    const o=dec($('offerIn').value);
+    pc=new RTCPeerConnection(cfg);watch(pc);
+    pc.ontrack=e=>{
+      const a=$('remote');a.srcObject=e.streams[0];$('listen').classList.remove('hide');
+      a.play().catch(()=>$('tapPlay').classList.remove('hide'));
     };
-    requestAnimationFrame(step);
-  }
-  db.collection('proposals').get()
-    .then(snap => animateCount(document.getElementById('counter1'), Math.max(snap.size, 12)))
-    .catch(() => animateCount(document.getElementById('counter1'), 47));
-
-  // ── Expandir ──
-  const toggleBtn = document.getElementById('toggleExpandBtn');
-  const expandableDiv = document.getElementById('expandableSection');
-  let isExpanded = false;
-  toggleBtn.addEventListener('click', () => {
-    isExpanded = !isExpanded;
-    toggleBtn.classList.toggle('open', isExpanded);
-    expandableDiv.classList.toggle('open', isExpanded);
-    toggleBtn.innerHTML = isExpanded
-      ? '<i class="fas fa-chevron-up"></i> Ver menos opciones'
-      : '<i class="fas fa-chevron-down"></i> Añadir perfil, precio, diseño y más';
-    if (isExpanded) {
-      ['step2','step3','step4'].forEach((id, i) => setTimeout(() => document.getElementById(id)?.classList.add('active'), i * 110));
-    } else {
-      ['step2','step3','step4'].forEach(id => document.getElementById(id)?.classList.remove('active'));
-    }
-  });
-
-  // ── Tipo perfil ──
-  const profileTypeSelect = document.getElementById('profileType');
-  function toggleProfileFields() {
-    const isEmp = profileTypeSelect.value === 'empresa';
-    document.getElementById('empresaFields').style.display = isEmp ? 'block' : 'none';
-    document.getElementById('personaFields').style.display = isEmp ? 'none' : 'block';
-  }
-  profileTypeSelect.addEventListener('change', toggleProfileFields);
-  toggleProfileFields();
-
-  // ── Char counter ──
-  const descTA = document.getElementById('description');
-  const descCount = document.getElementById('descCount');
-  descTA.addEventListener('input', () => { descCount.textContent = `${descTA.value.length}/800`; });
-
-  // ── Logo upload ──
-  document.getElementById('logoUpload').addEventListener('change', e => {
-    const file = e.target.files[0];
-    const prevWrap = document.getElementById('logoPreview');
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        currentLogoBase64 = ev.target.result;
-        prevWrap.style.display = 'flex';
-        prevWrap.innerHTML = `<img src="${currentLogoBase64}" alt="Logo preview"><div class="logo-hint">Vista previa del logo.<br>Se mostrará circular en la propuesta.</div>`;
-      };
-      reader.readAsDataURL(file);
-    } else { currentLogoBase64 = ''; prevWrap.style.display = 'none'; prevWrap.innerHTML = ''; }
-  });
-
-  // ── Toast ──
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
-
-  async function copyToClip(text) {
-    try { await navigator.clipboard.writeText(text); showToast('✅ Enlace copiado'); }
-    catch {
-      const ta = document.createElement('textarea'); ta.value = text;
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-      document.body.removeChild(ta); showToast('✅ Copiado');
-    }
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-
-  // ── Claude API ──
-  async function callClaude(systemPrompt, userMessage) {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }]
-      })
-    });
-    if (!response.ok) throw new Error(`API error ${response.status}`);
-    const data = await response.json();
-    return data.content.map(b => b.text || '').join('');
-  }
-
-  function showAiLoading(container) {
-    container.innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Generando con IA...</div>`;
-    container.classList.add('visible');
-  }
-
-  function renderAiOptions(container, options, onSelect) {
-    container.innerHTML = `<div class="ai-suggestions-title"><i class="fas fa-wand-magic-sparkles"></i> Sugerencias de IA — clic para usar</div>`;
-    options.forEach(opt => {
-      const div = document.createElement('div');
-      div.className = 'ai-option';
-      div.textContent = opt;
-      div.addEventListener('click', () => {
-        onSelect(opt);
-        container.classList.remove('visible');
-        setTimeout(() => { container.innerHTML = ''; }, 280);
-        showToast('✦ Sugerencia aplicada');
-      });
-      container.appendChild(div);
-    });
-  }
-
-  // ── Sugerir título ──
-  async function aiSuggestTitle() {
-    const btn = document.getElementById('btnAiTitle');
-    const container = document.getElementById('aiTitleSuggestions');
-    const currentTitle = document.getElementById('title').value.trim();
-    const currentDesc = document.getElementById('description').value.trim();
-    if (!currentTitle && !currentDesc) { showToast('Escribe algo primero para que la IA pueda ayudarte'); return; }
-    btn.disabled = true;
-    showAiLoading(container);
-    try {
-      const raw = await callClaude(
-        'Eres un experto en copywriting de ventas B2B y B2C en español. Generas títulos de propuestas comerciales que sean impactantes, claros y que inciten a la acción. Responde SOLO con un JSON válido: {"titles": ["título 1", "título 2", "título 3"]}. Sin markdown, sin texto extra.',
-        `Título actual: "${currentTitle}"\nDescripción: "${currentDesc}"\n\nGenera 3 títulos alternativos poderosos para esta propuesta comercial.`
-      );
-      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
-      renderAiOptions(container, parsed.titles, val => { document.getElementById('title').value = val; });
-    } catch (e) {
-      container.innerHTML = `<div style="padding:0.55rem;font-size:0.78rem;color:#e53e3e;">⚠️ Error al conectar con la IA. Inténtalo de nuevo.</div>`;
-    } finally { btn.disabled = false; }
-  }
-
-  // ── Generar descripción ──
-  async function aiSuggestDescription() {
-    const btn = document.getElementById('btnAiDesc');
-    const container = document.getElementById('aiDescSuggestions');
-    const title = document.getElementById('title').value.trim();
-    if (!title) { showToast('Escribe primero el título para que la IA entienda el contexto'); return; }
-    btn.disabled = true;
-    showAiLoading(container);
-    try {
-      const raw = await callClaude(
-        'Eres un experto en copywriting de ventas en español. Escribes descripciones de servicios que convencen y venden, con bullet points claros, orientadas al cliente. Responde SOLO con JSON: {"descriptions": ["desc1", "desc2"]}. Sin markdown, sin texto extra.',
-        `Título del servicio: "${title}"\nDescripción actual: "${descTA.value.trim()}"\n\nGenera 2 descripciones comerciales en español, cada una de 3-5 bullet points (usa • como separador de línea). Máximo 350 caracteres cada una. Enfócate en beneficios concretos para el cliente.`
-      );
-      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
-      renderAiOptions(container, parsed.descriptions, val => { descTA.value = val; descTA.dispatchEvent(new Event('input')); });
-    } catch (e) {
-      container.innerHTML = `<div style="padding:0.55rem;font-size:0.78rem;color:#e53e3e;">⚠️ Error al conectar con la IA. Inténtalo de nuevo.</div>`;
-    } finally { btn.disabled = false; }
-  }
-
-  // ── Calcular precio ──
-  async function aiSuggestPrice() {
-    const btn = document.getElementById('btnAiPrice');
-    const container = document.getElementById('aiPriceSuggestions');
-    const title = document.getElementById('title').value.trim();
-    const desc = descTA.value.trim();
-    if (!title && !desc) { showToast('Rellena título y descripción primero'); return; }
-    btn.disabled = true;
-    showAiLoading(container);
-    try {
-      const raw = await callClaude(
-        'Eres un consultor de precios para servicios profesionales en España. Conoces bien el mercado español de consultoría, marketing, tecnología y formación. Responde SOLO con JSON: {"prices": ["precio1", "precio2", "precio3"]}. Sin markdown, sin texto extra.',
-        `Servicio: "${title}"\nDescripción: "${desc}"\nDuración: "${document.getElementById('duration').value.trim()}"\nPúblico: "${document.getElementById('targetAudience').value.trim()}"\nExperiencia: "${document.getElementById('experiencia').value.trim()}"\n\nSugiere 3 opciones de precio realistas para el mercado español (con € y formato claro). Incluye una opción de tarifa por hora, una por proyecto, y una premium.`
-      );
-      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
-      renderAiOptions(container, parsed.prices, val => { document.getElementById('price').value = val; });
-    } catch (e) {
-      container.innerHTML = `<div style="padding:0.55rem;font-size:0.78rem;color:#e53e3e;">⚠️ Error al conectar con la IA. Inténtalo de nuevo.</div>`;
-    } finally { btn.disabled = false; }
-  }
-
-  // ── Mejorar todo con IA ──
-  async function improveAllWithAI() {
-    const title = document.getElementById('title').value.trim();
-    const desc = descTA.value.trim();
-    if (!title && !desc) { showToast('Rellena al menos el título o la descripción para que la IA pueda mejorar'); return; }
-    const overlay = document.getElementById('aiModalOverlay');
-    const body = document.getElementById('aiModalBody');
-    overlay.classList.add('visible');
-    body.innerHTML = `<div class="ai-loading"><div class="ai-dots"><span></span><span></span><span></span></div> Analizando y mejorando tu propuesta...</div>`;
-    const btn = document.getElementById('btnImproveAll');
-    btn.disabled = true;
-    try {
-      const raw = await callClaude(
-        'Eres un experto en ventas B2B/B2C y copywriting comercial en español. Tu tarea es mejorar propuestas comerciales para que sean más persuasivas, claras y profesionales. Responde SOLO con JSON válido, sin markdown ni texto extra.',
-        `Mejora esta propuesta comercial:
-Título: "${title}"
-Descripción: "${desc}"
-Precio: "${document.getElementById('price').value.trim()}"
-Duración: "${document.getElementById('duration').value.trim()}"
-Target: "${document.getElementById('targetAudience').value.trim()}"
-
-Responde con este JSON exacto:
-{
-  "titulo_mejorado": "título optimizado aquí",
-  "descripcion_mejorada": "descripción mejorada aquí con bullet points usando •",
-  "puntos_fuertes": ["punto 1", "punto 2", "punto 3"],
-  "sugerencia_precio": "sugerencia de precio si aplica",
-  "llamada_accion": "texto de botón CTA sugerido"
-}`
-      );
-      const data = JSON.parse(raw.replace(/```json|```/g, '').trim());
-      let html = '';
-      if (data.titulo_mejorado) html += `<div class="ai-result-section"><div class="ai-result-label">✦ Título optimizado</div><div class="ai-result-content">${escapeHtml(data.titulo_mejorado)}</div></div>`;
-      if (data.descripcion_mejorada) html += `<div class="ai-result-section"><div class="ai-result-label">✦ Descripción mejorada</div><div class="ai-result-content">${escapeHtml(data.descripcion_mejorada)}</div></div>`;
-      if (data.puntos_fuertes?.length) html += `<div class="ai-result-section"><div class="ai-result-label">✦ Puntos fuertes detectados</div><div class="ai-result-content">${data.puntos_fuertes.map(p => '• ' + escapeHtml(p)).join('\n')}</div></div>`;
-      if (data.sugerencia_precio) html += `<div class="ai-result-section"><div class="ai-result-label">✦ Sugerencia de precio</div><div class="ai-result-content">${escapeHtml(data.sugerencia_precio)}</div></div>`;
-      if (data.llamada_accion) html += `<div class="ai-result-section"><div class="ai-result-label">✦ CTA sugerido</div><div class="ai-result-content">${escapeHtml(data.llamada_accion)}</div></div>`;
-      const dataStr = JSON.stringify(data).replace(/"/g, '&quot;');
-      html += `<div class="ai-modal-actions"><button class="btn-modal-apply" onclick="applyAIImprovement(${dataStr})"><i class="fas fa-check"></i> Aplicar mejoras al formulario</button><button class="btn-modal-cancel" onclick="closeAiModal()">Cerrar</button></div>`;
-      body.innerHTML = html;
-      window._aiImproveData = data;
-    } catch (e) {
-      body.innerHTML = `<div style="padding:1rem;color:#e53e3e;font-size:0.85rem;">⚠️ Error al conectar con la IA. Verifica tu conexión e inténtalo de nuevo.</div><div class="ai-modal-actions"><button class="btn-modal-cancel" onclick="closeAiModal()">Cerrar</button></div>`;
-    } finally { btn.disabled = false; }
-  }
-
-  function applyAIImprovement(data) {
-    if (data.titulo_mejorado) document.getElementById('title').value = data.titulo_mejorado;
-    if (data.descripcion_mejorada) { descTA.value = data.descripcion_mejorada; descTA.dispatchEvent(new Event('input')); }
-    closeAiModal();
-    showToast('✦ ¡Mejoras aplicadas al formulario!');
-    ['title', 'description'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.style.borderColor = 'var(--ai)';
-        el.style.boxShadow = '0 0 0 3px rgba(110,63,206,0.15)';
-        setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 2000);
-      }
-    });
-  }
-
-  function closeAiModal() { document.getElementById('aiModalOverlay').classList.remove('visible'); }
-  document.getElementById('aiModalOverlay').addEventListener('click', function(e) { if (e.target === this) closeAiModal(); });
-
-  // ── Guardar propuesta ──
-  async function saveProposal(e) {
-    e.preventDefault();
-    const title = document.getElementById('title').value.trim();
-    const description = document.getElementById('description').value.trim();
-    const price = document.getElementById('price').value.trim();
-    const paymentLink = document.getElementById('paymentLink').value.trim();
-    const duration = document.getElementById('duration').value.trim();
-    const targetAudience = document.getElementById('targetAudience').value.trim();
-    const primaryColor = document.getElementById('primaryColor').value;
-    const bgColor = document.getElementById('bgColor').value;
-    const fontFamily = document.getElementById('fontFamily').value;
-    const experiencia = document.getElementById('experiencia').value.trim();
-    const profileType = profileTypeSelect.value;
-    let profileName = '', profileDesc = '';
-    if (profileType === 'empresa') {
-      profileName = document.getElementById('empresaNombre').value.trim();
-      profileDesc = document.getElementById('empresaDesc').value.trim();
-    } else {
-      profileName = document.getElementById('personaNombre').value.trim();
-      profileDesc = document.getElementById('personaDesc').value.trim();
-    }
-    if (!title) return showToast('❌ El título es obligatorio');
-    if (!description) return showToast('❌ La descripción es obligatoria');
-    if (isExpanded && paymentLink && !paymentLink.startsWith('http')) return showToast('❌ Link de pago válido (https://)');
-
-    const btn = document.getElementById('createBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Publicando...';
-
-    try {
-      const proposalData = {
-        title, description, price, paymentLink, duration, targetAudience,
-        primaryColor, bgColor, fontFamily,
-        logo: currentLogoBase64 || '',
-        profileType, profileName, profileDesc, experiencia,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      if (currentEditingId) {
-        await db.collection('proposals').doc(currentEditingId).update(proposalData);
-        showToast('✅ Propuesta actualizada');
-        const url = `${window.location.origin}${window.location.pathname}?id=${currentEditingId}`;
-        document.getElementById('resultArea').innerHTML = buildResultHTML(url, true);
-      } else {
-        const docRef = await db.collection('proposals').add({ ...proposalData, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        currentEditingId = docRef.id;
-        const url = `${window.location.origin}${window.location.pathname}?id=${docRef.id}`;
-        document.getElementById('resultArea').innerHTML = buildResultHTML(url, false);
-        ['step1','step2','step3','step4'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) { el.classList.remove('active'); el.classList.add('done'); el.innerHTML = '✓'; }
-        });
-        showToast('🎉 ¡Propuesta publicada!');
-      }
-      bindResultActions();
-    } catch (err) {
-      showToast('❌ Error: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-magic"></i> Actualizar propuesta ✦';
-    }
-  }
-
-  function buildResultHTML(url, isEdit) {
-    return `<div class="result-card">
-      <h4>${isEdit ? '✦ Propuesta actualizada' : '🎉 ¡Propuesta publicada!'}</h4>
-      <a href="${url}" target="_blank" class="result-url">${url}</a>
-      <div class="result-actions">
-        <button class="btn-sm primary" id="copyUrlBtn">Copiar enlace</button>
-        <button class="btn-sm secondary" id="openBtn">Ver propuesta →</button>
-        <button class="btn-sm secondary" id="editAgainBtn">✏️ Editar</button>
-      </div>
-    </div>`;
-  }
-
-  function bindResultActions() {
-    const url = `${window.location.origin}${window.location.pathname}?id=${currentEditingId}`;
-    document.getElementById('copyUrlBtn')?.addEventListener('click', () => copyToClip(url));
-    document.getElementById('openBtn')?.addEventListener('click', () => window.open(url, '_blank'));
-    document.getElementById('editAgainBtn')?.addEventListener('click', () => { loadDataToForm(currentEditingId); showToast('✏️ Modo edición activo'); });
-  }
-
-  async function loadDataToForm(id) {
-    const doc = await db.collection('proposals').doc(id).get();
-    if (!doc.exists) return;
-    const d = doc.data();
-    document.getElementById('title').value = d.title || '';
-    document.getElementById('description').value = d.description || '';
-    document.getElementById('price').value = d.price || '';
-    document.getElementById('paymentLink').value = d.paymentLink || '';
-    document.getElementById('duration').value = d.duration || '';
-    document.getElementById('targetAudience').value = d.targetAudience || '';
-    document.getElementById('primaryColor').value = d.primaryColor || '#0066cc';
-    document.getElementById('bgColor').value = d.bgColor || '#ffffff';
-    document.getElementById('fontFamily').value = d.fontFamily || "'Instrument Sans', sans-serif";
-    document.getElementById('experiencia').value = d.experiencia || '';
-    descTA.dispatchEvent(new Event('input'));
-    if (d.profileType) {
-      profileTypeSelect.value = d.profileType;
-      toggleProfileFields();
-      if (d.profileType === 'empresa') { document.getElementById('empresaNombre').value = d.profileName || ''; document.getElementById('empresaDesc').value = d.profileDesc || ''; }
-      else { document.getElementById('personaNombre').value = d.profileName || ''; document.getElementById('personaDesc').value = d.profileDesc || ''; }
-    }
-    if (d.logo && d.logo.startsWith('data:image')) {
-      currentLogoBase64 = d.logo;
-      const prevWrap = document.getElementById('logoPreview');
-      prevWrap.style.display = 'flex';
-      prevWrap.innerHTML = `<img src="${currentLogoBase64}" alt="Logo"><div class="logo-hint">Logo actual</div>`;
-    }
-    currentEditingId = id;
-    if (!isExpanded) toggleBtn.click();
-  }
-
-  // ── Vista propuesta ──
-  async function renderProposalOnly() {
-    const id = new URLSearchParams(window.location.search).get('id');
-    if (!id) return false;
-    document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:\'Instrument Sans\',sans-serif;color:#8e8e96;font-size:0.88rem;">Cargando propuesta...</div>';
-    try {
-      const doc = await db.collection('proposals').doc(id).get();
-      if (!doc.exists) { document.body.innerHTML = '<div style="text-align:center;padding:4rem;font-family:\'Instrument Sans\',sans-serif"><h2>Propuesta no encontrada</h2></div>'; return true; }
-      const d = doc.data();
-      const primary = d.primaryColor || '#0066cc';
-      const bg = d.bgColor || '#ffffff';
-      const font = d.fontFamily || "'Instrument Sans', sans-serif";
-      const logoHTML = d.logo ? `<img src="${d.logo}" class="proposal-logo" alt="Logo">` : `<div class="proposal-logo-placeholder"><i class="fas fa-user"></i></div>`;
-      const tags = [
-        d.experiencia ? `<span class="tag"><i class="fas fa-medal"></i>${escapeHtml(d.experiencia)}</span>` : '',
-        d.duration ? `<span class="tag"><i class="fas fa-hourglass-start"></i>${escapeHtml(d.duration)}</span>` : '',
-        d.targetAudience ? `<span class="tag"><i class="fas fa-bullseye"></i>${escapeHtml(d.targetAudience)}</span>` : '',
-      ].filter(Boolean).join('');
-      const priceBlock = d.price ? `<div class="price-block"><div class="price-label">Inversión</div><div class="price-amount" style="color:${primary};">${escapeHtml(d.price)}</div>${d.paymentLink ? `<a href="${escapeHtml(d.paymentLink)}" target="_blank" class="pay-btn" style="background:${primary};">Proceder al pago <span class="arrow">→</span></a>` : ''}</div>` : '';
-      document.body.innerHTML = `
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-        <style>
-          *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-          html{-webkit-font-smoothing:antialiased}
-          body{background:#f5f5f7;font-family:${font};color:#1d1d1f}
-          .proposal-logo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2.5px solid white;box-shadow:0 6px 20px rgba(0,0,0,0.1);margin-bottom:0.9rem}
-          .proposal-logo-placeholder{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#e5e5ea,#d0d0d8);display:flex;align-items:center;justify-content:center;margin:0 auto 0.9rem;font-size:1.8rem;color:#aaa}
-          .proposal-view{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px 80px}
-          .proposal-card{max-width:720px;width:100%;background:${bg};border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.1),0 4px 16px rgba(0,0,0,0.05);overflow:hidden;animation:propIn 0.65s cubic-bezier(0.34,1.56,0.64,1) both}
-          @keyframes propIn{from{opacity:0;transform:translateY(24px) scale(0.97)}to{opacity:1;transform:none}}
-          .proposal-header{padding:2.2rem 1.8rem 1.4rem;text-align:center;border-bottom:1px solid rgba(0,0,0,0.07)}
-          .proposal-header::before{content:'';display:block;height:4px;background:linear-gradient(90deg,${primary},#30d158);margin:-2.2rem -1.8rem 2rem}
-          .proposal-name{font-size:0.95rem;font-weight:600}
-          .proposal-role{font-size:0.77rem;color:#8e8e96;margin-top:2px}
-          .proposal-title-main{font-family:'Instrument Serif',Georgia,serif;font-size:2rem;letter-spacing:-0.02em;margin:0.9rem 0 0;line-height:1.1}
-          .proposal-body{padding:1.8rem}
-          .proposal-desc{font-size:0.93rem;line-height:1.72;color:#3c3c43;white-space:pre-wrap;margin-bottom:1.4rem}
-          .tag{display:inline-flex;align-items:center;gap:5px;background:#f2f2f7;color:#3c3c43;padding:0.32rem 0.85rem;border-radius:100px;font-size:0.72rem;font-weight:500;margin:0 5px 5px 0}
-          .tag i{font-size:0.62rem;color:${primary}}
-          .price-block{background:#f5f5f7;border-radius:18px;padding:1.4rem;text-align:center;border:1px solid rgba(0,0,0,0.07)}
-          .price-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;color:#8e8e96;margin-bottom:0.35rem}
-          .price-amount{font-size:2.8rem;font-weight:800;letter-spacing:-0.04em;margin-bottom:0.9rem}
-          .pay-btn{display:inline-flex;align-items:center;gap:9px;padding:0.9rem 1.8rem;border-radius:100px;color:white;font-weight:700;font-size:0.9rem;text-decoration:none;transition:all 0.25s}
-          .pay-btn:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(0,0,0,0.16)}
-          .proposal-footer{text-align:center;padding:0.9rem 1.8rem 1.4rem;font-size:0.62rem;color:#c0c0c8}
-          @media(max-width:600px){.proposal-title-main{font-size:1.5rem}.price-amount{font-size:2rem}.proposal-body,.proposal-header{padding:1.1rem}.proposal-header::before{margin:-1.1rem -1.1rem 1.1rem}}
-        </style>
-        <div class="proposal-view"><div class="proposal-card">
-          <div class="proposal-header">
-            ${logoHTML}
-            <div class="proposal-name">${escapeHtml(d.profileName || '')}</div>
-            <div class="proposal-role">${escapeHtml(d.profileDesc || '')}</div>
-            <div class="proposal-title-main">${escapeHtml(d.title)}</div>
-          </div>
-          <div class="proposal-body">
-            <div class="proposal-desc">${(d.description||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}</div>
-            ${tags ? `<div style="margin-bottom:1.4rem;">${tags}</div>` : ''}
-            ${priceBlock}
-          </div>
-          <div class="proposal-footer">Creado con Vinclechat 🐘 · Propuestas profesionales</div>
-        </div></div>`;
-    } catch(e) {
-      document.body.innerHTML = '<div style="padding:4rem;text-align:center;font-family:sans-serif;color:#666;">Error al cargar la propuesta.</div>';
-    }
-    return true;
-  }
-
-  document.getElementById('proposalForm').addEventListener('submit', saveProposal);
-
-  window.addEventListener('load', async () => {
-    const params = new URLSearchParams(window.location.search);
-    const idParam = params.get('id');
-    const editParam = params.get('edit');
-    if (idParam) { await renderProposalOnly(); }
-    else if (editParam) { await loadDataToForm(editParam); window.history.replaceState({}, '', window.location.pathname); }
-  });
+    await pc.setRemoteDescription({type:'offer',sdp:o.s});
+    const an=await pc.createAnswer();an.sdp=hq(an.sdp);
+    await pc.setLocalDescription(an);status('Preparando respuesta…');await gathered(pc);
+    $('answerOut').value=enc({s:pc.localDescription.sdp});
+    $('ansCard').classList.remove('hide');
+    status('Envía este código de vuelta. Se conectará solo.');
+    $('remote').play().catch(()=>{});
+  }catch(e){status('Ese código no es válido. Cópialo entero.','bad')}
+};
+$('tapPlay').onclick=()=>{$('remote').play();$('tapPlay').classList.add('hide')};
 </script>
 </body>
 </html>
