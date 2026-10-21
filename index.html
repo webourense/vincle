@@ -3,286 +3,389 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BiBeat – dos auriculares, un solo latido</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Unbounded:wght@800&display=swap" rel="stylesheet">
+<title>BiBeat – dos auriculares, una canción</title>
 <style>
-:root{--bg:#0b0814;--panel:#151027;--line:#2c2450;--txt:#f4f0ff;--mut:#a89fcf;--a:#28e0ff;--b:#ff3d8b;--gold:#ffd166;--err:#ff8f9c;color-scheme:dark}
+:root{--bg:#0b0e1d;--panel:rgba(26,32,64,.72);--line:#2f3a70;--txt:#eef0fa;--mut:#9aa3c7;--a:#b9c0e6;--b:#b9a6ff;--err:#ff8f9c;color-scheme:dark}
 *{box-sizing:border-box}
-html,body{margin:0}
-body{background:radial-gradient(900px 500px at 15% -10%,#1a2a5a55,transparent),radial-gradient(800px 500px at 100% 0,#5a1a4a55,transparent),var(--bg);background-attachment:fixed;color:var(--txt);font:16px/1.5 Outfit,"Avenir Next","Trebuchet MS",sans-serif;padding:18px 16px 60px}
-main{max-width:620px;margin:0 auto}
-h1{font:800 clamp(2.6rem,12vw,4rem)/1 Unbounded,"Arial Black",Impact,sans-serif;margin:0;letter-spacing:-.04em;text-align:center}
-.tag{text-align:center;color:var(--mut);margin:6px 0 0}
-p{margin:0 0 12px}.mut{color:var(--mut);font-size:.92rem}
-.logo{display:block;margin:0 auto -4px;width:120px}
-.logo circle{fill:none;stroke-width:calc(5px + var(--lvl,0)*9px);transition:stroke-width .08s}
-.logo .r1{stroke:var(--a)}.logo .r2{stroke:var(--b)}
-#cv{display:block;width:100%;height:110px;margin:10px 0 0;border-radius:14px}
-body.big #cv{position:fixed;inset:0;width:100vw;height:100vh;z-index:60;margin:0;border-radius:0;background:var(--bg)}
-#bigT{display:none;position:fixed;z-index:61;left:0;right:0;bottom:8vh;text-align:center;font:800 clamp(1.4rem,6vw,3rem) Unbounded,sans-serif;padding:0 16px;pointer-events:none}
-body.big #bigT{display:block}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
-.count{text-align:center;border-color:#3b3068}
-#cnt{font:800 2.4rem/1 Unbounded,sans-serif;color:var(--gold)}
-.bar{height:8px;background:var(--line);border-radius:8px;margin:12px 0 6px;overflow:hidden}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--txt);font:16px/1.5 "Gill Sans","Trebuchet MS",Verdana,sans-serif;padding:18px 16px 56px;overflow-x:hidden}
+.aurora{position:fixed;inset:-20%;z-index:-1;background:radial-gradient(40% 35% at 25% 20%,color-mix(in srgb,var(--a) 45%,transparent),transparent 70%),radial-gradient(45% 40% at 80% 75%,rgba(120,90,255,.4),transparent 70%);transform:scale(calc(1 + var(--lvl,0)*.18));transition:transform .12s,background 1s;animation:drift 14s ease-in-out infinite alternate}
+@keyframes drift{to{translate:4% -3%}}
+@media(prefers-reduced-motion:reduce){.aurora{animation:none;transition:none}}
+main{max-width:600px;margin:0 auto}
+header{text-align:center}
+.rings{width:170px;height:auto;display:block;margin:0 auto}
+.rings circle{fill:none;stroke-width:calc(5px + var(--lvl,0)*11px);transition:stroke-width .08s}
+.rings .r1{stroke:var(--a)}.rings .r2{stroke:var(--b)}
+h1{font-size:3rem;margin:0;letter-spacing:-.02em;line-height:1;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{margin:6px 0 12px;color:var(--mut)}
+.pill{display:inline-flex;gap:8px;align-items:center;border-radius:99px;padding:8px 16px;font-size:.95rem}
+.bar{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin:10px auto 0;max-width:260px}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:width 1.2s}
-.choose{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-button{font:inherit;color:var(--txt);background:#1d1636;border:1px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer}
-button:hover{border-color:var(--a)}
-button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-button.main{background:var(--a);color:#04222a;border-color:var(--a);font-weight:600}
-button.alt{background:var(--b);color:#2a0215;border-color:var(--b);font-weight:600}
-button.on,.tabs button.sel{border-color:var(--a);color:var(--a)}
-.choose button{padding:22px 10px;font-weight:600;font-size:1.05rem}
-input[type=text]{width:100%;background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:11px;font:inherit}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0;backdrop-filter:blur(8px)}
+button,.btn{font:inherit;color:var(--txt);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:11px;padding:10px 14px;cursor:pointer;text-align:center;display:inline-block}
+button:hover,.btn:hover{border-color:var(--a)}
+button:focus-visible,input:focus-visible,select:focus-visible,.btn:focus-within{outline:3px solid var(--b);outline-offset:2px}
+button.main{background:var(--a);color:#0b0e1d;border-color:var(--a);font-weight:700}
+button.on{border-color:var(--a);color:var(--a);font-weight:700}
+button:disabled{opacity:.5}
+.home{display:grid;gap:10px}
+.home button{padding:18px;text-align:left;font-size:1.05rem}
+.home small{display:block;color:var(--mut);font-size:.85rem;margin-top:2px}
+input[type=text],select{width:100%;background:rgba(0,0,0,.3);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
 #codeIn{font-size:1.8rem;letter-spacing:.3em;text-align:center;text-transform:uppercase}
-input[type=range]{width:100%;accent-color:var(--b)}
-label{display:block;margin:4px 0 6px;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--a)}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
-.step{font-weight:600;margin:0 0 8px}
-#status{padding:10px 14px;border-radius:12px;border:1px solid var(--line);margin:14px 0;font-size:.95rem}
+.step{font-weight:700;margin:0 0 8px}
+.mut{color:var(--mut);font-size:.9rem;margin:8px 0 0}
+#status{padding:10px 14px;border-radius:11px;border:1px solid var(--line);margin:12px 0;font-size:.95rem;background:var(--panel)}
 #status.ok{border-color:var(--a)}#status.bad{border-color:var(--err);color:var(--err)}
-#code{font:800 2.6rem/1.1 Unbounded,sans-serif;letter-spacing:.2em;text-align:center;color:var(--a);margin:4px 0 8px;padding-left:.2em}
-audio{width:100%;margin-top:10px;color-scheme:dark}
-#now,#title{font-weight:600;min-height:1.5em;margin:8px 0 0}
-ol.list{list-style:none;margin:10px 0 0;padding:0;max-height:300px;overflow:auto}
-ol.list button{width:100%;text-align:left;margin-bottom:5px;padding:8px 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-ol.list button.cur{border-color:var(--b);color:var(--b);font-weight:600}
-.hist{list-style:none;margin:10px 0 0;padding:0 0 0 18px;border-left:2px solid var(--line)}
-.hist li{position:relative;margin:0 0 14px;color:var(--mut)}
-.hist li:before{content:"";position:absolute;left:-26px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--line)}
-.hist li.got{color:var(--txt)}.hist li.got:before{background:var(--gold);box-shadow:0 0 12px var(--gold)}
-.hist b{display:block}
-details{margin-top:18px}summary{cursor:pointer;font-weight:600}
-#toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-140%);background:var(--gold);color:#2b2000;font-weight:600;padding:12px 18px;border-radius:14px;z-index:90;transition:transform .5s;max-width:90vw;text-align:center}
-#toast.show{transform:translate(-50%,0)}
-#fx{position:fixed;inset:0;pointer-events:none;z-index:80}
-.hide{display:none}
-@media(prefers-reduced-motion:reduce){.bar i,#toast{transition:none}}
+#code{font-size:3rem;font-weight:700;letter-spacing:.25em;text-align:center;color:var(--a);padding-left:.25em}
+audio{width:100%;margin-top:10px}
+#now{font-weight:700;margin:10px 0 0;min-height:1.5em}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chips button{padding:5px 12px;border-radius:99px;font-size:.88rem}
+ol.list{list-style:none;margin:8px 0 0;padding:0;max-height:300px;overflow:auto}
+ol.list button{width:100%;text-align:left;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{flex:1}
+dialog{background:#141a36;color:var(--txt);border:1px solid var(--a);border-radius:16px;max-width:480px;width:calc(100% - 32px);max-height:80vh}
+dialog::backdrop{background:rgba(5,7,18,.75)}
+.ch{border-left:3px solid var(--a);padding:2px 0 2px 12px;margin:14px 0}.ch.lock{opacity:.4;border-color:var(--line)}
+.ch b{display:block}
+#cf{position:fixed;inset:0;pointer-events:none;z-index:9}
+.hide{display:none!important}
+details{margin-top:18px}summary{cursor:pointer;font-weight:700}
 </style>
 </head>
 <body>
-<canvas id="fx"></canvas><div id="toast" role="status"></div>
+<div class="aurora"></div><canvas id="cf" class="hide"></canvas>
 <main>
-<svg class="logo" viewBox="0 0 150 80" aria-hidden="true"><circle class="r1" cx="52" cy="40" r="26"/><circle class="r2" cx="98" cy="40" r="26"/></svg>
-<h1>BiBeat</h1>
-<p class="tag">Dos auriculares. Un solo latido.</p>
-<canvas id="cv" aria-hidden="true"></canvas><div id="bigT"></div>
-<div class="row"><button id="bigB">Modo concierto</button></div>
+<header>
+  <svg class="rings" viewBox="0 0 150 80" aria-hidden="true"><circle class="r1" cx="52" cy="40" r="26"/><circle class="r2" cx="98" cy="40" r="26"/></svg>
+  <h1>BiBeat</h1>
+  <p class="tag">Dos auriculares. Una sola canción.</p>
+  <button class="pill" id="cnt" aria-haspopup="dialog"><span id="cntT">Contando oídos…</span></button>
+  <div class="bar" aria-hidden="true"><i id="cntB"></i></div>
+</header>
 
-<div class="card count">
-  <div id="cnt">…</div>
-  <p class="mut" style="margin:6px 0 0">personas ya han usado BiBeat</p>
-  <div class="bar"><i id="prog"></i></div>
-  <p class="mut" id="next" style="margin:0"></p>
-  <p class="mut" id="ses" style="margin:6px 0 0"></p>
-</div>
+<div id="status" role="status">Elige cómo quieres escuchar.</div>
 
-<div id="status" role="status">Elige tu papel para empezar.</div>
-<div class="choose" id="choose">
-  <button id="pickHost">Pongo la música</button>
-  <button id="pickGuest">Quiero escuchar</button>
-</div>
+<section id="home" class="home">
+  <button id="pickHost">Pongo la música<small>Creas una sala y la otra persona entra con un código o enlace, desde cualquier red.</small></button>
+  <button id="pickGuest">Quiero escuchar<small>Entras en la sala de alguien con su código.</small></button>
+  <button id="pickLocal">Dos auriculares en este dispositivo<small>Cada uno con los suyos, mismo equipo.</small></button>
+</section>
 
-<!-- ANFITRIÓN -->
-<section id="host" class="hide">
-  <div class="card">
-    <p class="step">Tu código de sala</p>
-    <div id="code" aria-live="polite">·····</div>
-    <div class="row"><button id="copyLink">Copiar enlace</button><button id="shareLink" class="main">Enviar por WhatsApp</button></div>
-    <p class="mut" style="margin:10px 0 0" id="listeners"></p>
+<section id="acct" class="card hide">
+  <p class="step">Tu cuenta</p>
+  <div class="row"><select id="accSel" aria-label="Cuenta"></select><button id="accNew" style="flex:0 0 auto">Nueva</button><button id="accDel" style="flex:0 0 auto">Borrar</button></div>
+  <div id="accForm" class="row hide"><input type="text" id="accName" placeholder="Nombre de la cuenta" maxlength="24"><select id="accType" aria-label="Tipo"></select><button id="accOk" class="main" style="flex:0 0 auto">Crear</button></div>
+  <p class="mut" id="accInfo"></p>
+</section>
+
+<section id="hostCard" class="card hide">
+  <p class="step">Tu código de sala</p>
+  <div id="code" aria-live="polite">· · · · ·</div>
+  <div class="row"><button id="copyLink">Copiar enlace</button><button id="shareLink" class="main">Enviar por WhatsApp</button></div>
+  <p class="mut" id="listeners"></p>
+</section>
+
+<section id="libCard" class="card hide">
+  <div class="tabs" id="srcTabs"><button class="on" data-t="loc">Mi música</button><button data-t="sp" id="tabSp">Spotify</button></div>
+  <div id="locPane">
+    <div class="row"><label class="btn">Archivos<input type="file" id="fFiles" accept="audio/*" multiple hidden></label><label class="btn" id="dirLbl">Carpeta entera<input type="file" id="fDir" webkitdirectory multiple hidden></label></div>
+    <p class="mut">Las subcarpetas se convierten en categorías. En móvil, si no puedes elegir carpeta, entra en ella y selecciona todo en «Archivos».</p>
+    <input type="text" id="q" placeholder="Buscar canción…" style="margin-top:10px" aria-label="Buscar">
+    <div class="chips" id="chips"></div>
+    <p id="now"></p>
+    <audio id="player" controls></audio>
+    <div class="row"><button id="prev" aria-label="Anterior">⏮</button><button id="shuf">Aleatorio</button><button id="next" aria-label="Siguiente">⏭</button></div>
+    <ol class="list" id="list"></ol>
+    <div class="row"><button id="tabCap" class="hide">Compartir audio de una pestaña (PC)</button></div>
   </div>
-
-  <div class="tabs"><button id="tabA" class="sel">Mi música</button><button id="tabS">Spotify</button></div>
-
-  <div id="audioPanel">
-    <div class="card">
-      <p class="step">Biblioteca</p>
-      <div class="row" style="margin:0">
-        <button id="pickDir" class="main">Elegir carpeta</button>
-        <button id="pickFiles">Elegir archivos</button>
-      </div>
-      <input type="file" id="dir" webkitdirectory multiple class="hide">
-      <input type="file" id="files" accept="audio/*" multiple class="hide">
-      <input type="text" id="q" placeholder="Buscar en la biblioteca…" class="hide" style="margin-top:10px">
-      <p class="mut" id="libInfo" style="margin:8px 0 0">Una carpeta entera, con sus subcarpetas, o los archivos que quieras (mp3, m4a, wav, flac, ogg).</p>
-      <ol class="list" id="list"></ol>
-    </div>
-    <div class="card">
-      <p id="now" style="margin:0">Nada en reproducción</p>
-      <audio id="player" controls></audio>
-      <div class="row"><button id="prev">Anterior</button><button id="next2">Siguiente</button><button id="shuf">Aleatorio</button><button id="rep">Repetir: no</button></div>
-      <div class="row"><button id="tabCap" class="hide">Compartir audio de una pestaña (PC)</button></div>
-    </div>
-    <div class="card">
-      <label for="dly">Sincronía: mi retraso <span id="dlyV">200</span> ms</label>
-      <input type="range" id="dly" min="0" max="1000" step="10" value="200">
-      <div class="row"><button id="dm">− 10 ms</button><button id="dp">+ 10 ms</button></div>
-      <p class="mut" style="margin:10px 0 0">Si lo oyes antes que ella, sube el valor. Si después, bájalo. Se recuerda.</p>
-    </div>
-  </div>
-
-  <div id="spPanel" class="hide">
-    <div class="card">
-      <p class="step">Spotify sincronizado</p>
-      <input type="text" id="spIn" placeholder="Pega un enlace de Spotify (canción, álbum o lista)" autocomplete="off">
-      <div class="row"><button id="spGo" class="main">Cargar en los dos</button></div>
-      <div id="spHostEl" style="margin-top:12px"></div>
-      <p class="mut" style="margin:10px 0 0">Spotify no permite copiar su audio, así que cada móvil lo reproduce con su propia cuenta y BiBeat los mantiene en sincronía: play, pausa, saltos y cambios de canción. Los dos necesitáis tener Spotify abierto en ese navegador. Con la sesión iniciada suena entera; si no, solo fragmentos.</p>
-    </div>
+  <div id="spPane" class="hide">
+    <input type="text" id="spIn" placeholder="Pega un enlace de Spotify (canción, álbum o playlist)" aria-label="Enlace de Spotify">
+    <div class="row"><button id="spGo" class="main">Poner</button><button id="spSave">Guardar en esta cuenta</button></div>
+    <div id="spList" style="margin-top:10px"></div>
+    <div id="spBox" style="margin-top:10px"></div>
+    <p class="mut">Cada persona escucha con su propia cuenta de Spotify (con la sesión iniciada en el navegador, si no solo salen fragmentos de 30 s). BiBeat sincroniza play, pausa y posición. Pulsa play en el reproductor de Spotify.</p>
   </div>
 </section>
 
-<!-- INVITADA -->
+<section id="dualCard" class="card hide">
+  <p class="step">Dos auriculares en este dispositivo</p>
+  <div class="row"><button id="pA">Elegir auriculares A</button><button id="pB">Elegir auriculares B</button></div>
+  <p class="mut" id="outInfo">Conéctalos antes por Bluetooth al equipo y pulsa cada botón.</p>
+  <div class="row"><button id="dGo" class="main">Activar los dos</button><button id="dStop" class="hide">Parar</button></div>
+  <label class="mut" style="display:block;margin-top:12px">Volumen A<input type="range" id="vA" min="0" max="1" step=".01" value="1"></label>
+  <label class="mut" style="display:block">Volumen B<input type="range" id="vB" min="0" max="1" step=".01" value="1"></label>
+  <label class="mut" style="display:block">Desfase de B respecto a A: <span id="offV">0</span> ms<input type="range" id="off" min="-300" max="300" step="5" value="0"></label>
+  <p class="mut" id="dualNote"></p>
+</section>
+
+<section id="hostSync" class="card hide">
+  <label for="dly" style="font-weight:700">Sincronía: mi retraso <span id="dlyV">200</span> ms</label>
+  <input type="range" id="dly" min="0" max="1000" step="10" value="200">
+  <div class="row"><button id="dm">− 10 ms</button><button id="dp">+ 10 ms</button></div>
+  <p class="mut">Si lo oyes antes que la otra persona, sube el valor. Si lo oyes después, bájalo.</p>
+</section>
+
 <section id="guest" class="hide">
   <div class="card" id="joinCard">
     <p class="step">Código de sala</p>
-    <input type="text" id="codeIn" maxlength="5" placeholder="XXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
+    <input type="text" id="codeIn" maxlength="5" placeholder="XXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Código de sala">
     <div class="row"><button id="join" class="main">Escuchar</button></div>
   </div>
   <div class="card hide" id="listen">
     <p class="mut" style="margin:0">Sonando</p>
-    <p id="title">…</p>
-    <div id="gAudio"><audio id="remote" controls autoplay playsinline></audio>
-      <div class="row"><button id="tapPlay" class="alt hide">Toca para escuchar</button></div></div>
-    <div id="gSp" class="hide"><div id="spGuestEl"></div>
-      <p class="mut" style="margin:10px 0 0">Spotify se sincroniza solo con quien pone la música. Si no suena, pulsa play una vez en el reproductor.</p></div>
+    <p id="title" style="font-weight:700;margin:0">…</p>
+    <audio id="remote" controls autoplay playsinline></audio>
+    <div class="row"><button id="tapPlay" class="main hide">Toca para escuchar</button></div>
+    <div id="gSpBox" class="hide" style="margin-top:12px"></div>
+    <p class="mut">El volumen se cambia con los botones de tu móvil.</p>
   </div>
 </section>
-
-<div class="card">
-  <p class="step">La historia de BiBeat</p>
-  <p class="mut" style="margin:0">Cada 1.000 personas que usan BiBeat se desbloquea un hito.</p>
-  <ol class="hist" id="hist"></ol>
-</div>
 
 <details>
   <summary>Cómo usarlo</summary>
   <ol class="mut">
-    <li>Cada uno conecta sus auriculares Bluetooth a su propio móvil.</li>
-    <li>Tú eliges «Pongo la música» y envías el enlace o el código de 5 letras.</li>
-    <li>Ella abre el enlace y pulsa «Escuchar».</li>
-    <li>Elige una carpeta de música o un enlace de Spotify, y dale al play.</li>
+    <li><b>A distancia:</b> uno crea la sala y envía el enlace; el otro lo abre y pulsa «Escuchar». Pueden estar en redes distintas (wifi, datos…).</li>
+    <li><b>Mismo dispositivo:</b> funciona en Chrome o Edge de PC con los dos auriculares ya emparejados al equipo. Los móviles no permiten elegir salida de audio desde una web; ahí usa «Audio dual» (Samsung) o Auracast del sistema.</li>
+    <li><b>Cuentas:</b> cada una tiene su tipo (Pareja, Amigos, Fiesta…), su color y sus enlaces de Spotify guardados.</li>
   </ol>
-  <p class="mut">Hace falta internet en los dos móviles. Mantened la pantalla encendida y la pestaña abierta. Elegir una carpeta entera funciona en Chrome, Edge y Android; en iPhone usa «Elegir archivos». Pulsa la barra espaciadora para pausar desde el PC.</p>
+  <p class="mut">Mantened pantalla encendida y pestaña abierta durante la sesión.</p>
 </details>
 </main>
+
+<dialog id="story"><div id="storyB"></div><div class="row"><button id="storyX" class="main">Seguir escuchando</button></div></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const NS='bibeat-k2',AL='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const AL='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const rnd=n=>Array.from({length:n},()=>AL[Math.floor(Math.random()*AL.length)]).join('');
 const hq=s=>s.replace(/useinbandfec=1/g,'useinbandfec=1;stereo=1;sprop-stereo=1;maxaveragebitrate=192000');
 const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
-const fmt=n=>n.toLocaleString('es-ES');
-let peer,ctx,dest,delay,an,queue=[],view=[],qi=-1,conns=[],roomCode='',last={m:'audio',t:''},shuf=false,rep=0,counted=false;
-
+const ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},{urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'}]};
+const AC=window.AudioContext||window.webkitAudioContext;
+const P=$('player');
+let mode='',peer,ctx,dest,delay,src,conns=[],roomCode='',lastSp=null,vizOn=false;
 function status(t,c){const s=$('status');s.textContent=t;s.className=c||''}
-function show(id){$('choose').classList.add('hide');$(id).classList.remove('hide')}
 function toggleOn(v){document.body.classList.toggle('on',v)}
 async function keepAwake(){try{await navigator.wakeLock.request('screen')}catch(e){}}
+function viz(node,c){
+  if(vizOn)return;vizOn=true;
+  const an=c.createAnalyser();an.fftSize=256;node.connect(an);const d=new Uint8Array(an.fftSize);
+  (function f(){an.getByteTimeDomainData(d);let m=0;for(const v of d)m=Math.max(m,Math.abs(v-128));
+    document.documentElement.style.setProperty('--lvl',Math.min(1,m/90).toFixed(2));requestAnimationFrame(f)})();
+}
 if(typeof Peer==='undefined')status('No se pudo cargar la conexión. Revisa tu internet y recarga.','bad');
 
-// ---------- CONTADOR E HISTORIA ----------
-const HITOS=['Primer latido','El eco','Doble bajo','Hora punta','Sala llena','Estadio','Festival','Gira mundial','Cuenta atrás','Leyenda'];
-const hitoName=i=>HITOS[i-1]||('Hito '+i);
-async function ab(op,key){try{const r=await fetch('https://abacus.jasoncameron.dev/'+op+'/'+NS+'/'+key);if(!r.ok)return op==='get'?0:null;const j=await r.json();return +j.value}catch(e){return null}}
-function renderCount(n){
-  const el=$('cnt'),t0=performance.now();
-  (function f(t){const k=Math.min(1,(t-t0)/1200);el.textContent=fmt(Math.round(n*k));if(k<1)requestAnimationFrame(f)})(t0);
-  const got=Math.floor(n/1000),to=(got+1)*1000;
-  $('prog').style.width=((n%1000)/10)+'%';
-  $('next').textContent='Faltan '+fmt(to-n)+' para el hito de '+fmt(to)+': «'+hitoName(got+1)+'»';
-  const h=$('hist');h.textContent='';
-  const from=Math.max(1,got-4);
-  for(let i=from;i<=got+1;i++){
-    const li=document.createElement('li'),b=document.createElement('b');
-    b.textContent=fmt(i*1000)+' · '+hitoName(i);
-    li.appendChild(b);li.append(i<=got?'Desbloqueado':'Por desbloquear');
-    if(i<=got)li.className='got';h.appendChild(li);
-  }
-  if(!got){const li=document.createElement('li');li.textContent='Todavía no hay hitos: el primero llega a las 1.000 personas.';h.prepend(li)}
+// ===== Contador e historia =====
+const CH=['Nace la primera sala: dos auriculares encuentran su canción.','Mil oídos ya laten a la vez. El ritmo empieza a viajar sin cables.','Dos mil personas descubren que compartir música no necesita estar cerca.','Tres mil: las salas se llenan de playlists que unen a parejas, amigos y familias.','Cuatro mil: ya hay noches enteras sonando sincronizadas.','Cinco mil: BiBeat es un latido compartido que cruza ciudades.'];
+const chTxt=n=>CH[n-1]||'Otros mil oídos se sincronizan. La historia de BiBeat sigue sonando.';
+function story(n,hot){
+  const k=Math.floor(n/1000),b=$('storyB');b.textContent='';
+  const h=document.createElement('h2');h.textContent=hot?'¡Eres el usuario número '+n.toLocaleString('es')+'!':'La historia de BiBeat';b.appendChild(h);
+  const add=(t,s,lock)=>{const d=document.createElement('div');d.className='ch'+(lock?' lock':'');const e=document.createElement('b');e.textContent=t;d.appendChild(e);d.appendChild(document.createTextNode(s));b.appendChild(d)};
+  add('Hito siguiente · '+((k+1)*1000).toLocaleString('es')+' usuarios','Faltan '+((k+1)*1000-n).toLocaleString('es')+' para escribir el capítulo '+(k+1)+'.',true);
+  for(let i=k;i>=Math.max(1,k-9);i--)add('Capítulo '+i+' · '+(i*1000).toLocaleString('es')+' usuarios',chTxt(i));
+  add('Capítulo 0 · el principio','Una idea sencilla: que dos personas oigan lo mismo, cada una con sus auriculares.');
+  $('story').showModal();if(hot)confetti();
 }
-async function initCounter(){
-  const first=!store.get('bb-counted');
-  const n=await ab(first?'hit':'get','usuarios');
-  if(n===null){$('cnt').textContent='—';$('next').textContent='No se pudo leer el contador ahora mismo.';return}
-  if(first)store.set('bb-counted','1');
-  renderCount(n);
-  const ms=Math.floor(n/1000),seen=store.get('bb-ms');
-  if(first&&n%1000===0)celebrate('¡Eres la persona número '+fmt(n)+'! Hito «'+hitoName(ms)+'» desbloqueado');
-  else if(seen!==null&&ms>+seen)celebrate('¡Nuevo hito de BiBeat! '+fmt(ms*1000)+' personas: «'+hitoName(ms)+'»');
-  store.set('bb-ms',ms);
-  const s=await ab('get','sesiones');if(s)$('ses').textContent=fmt(s)+' sesiones de música compartida';
-}
-function celebrate(msg){
-  const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),6000);
+function confetti(){
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const c=$('fx'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
-  const P=Array.from({length:160},()=>({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*14,vy:-Math.random()*14-3,c:['#28e0ff','#ff3d8b','#ffd166','#fff'][Math.random()*4|0],s:3+Math.random()*5}));
-  let f=0;(function d(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++f<130)requestAnimationFrame(d);else x.clearRect(0,0,c.width,c.height)})();
+  const c=$('cf');c.classList.remove('hide');c.width=innerWidth;c.height=innerHeight;const x=c.getContext('2d');
+  const ps=Array.from({length:150},()=>({x:Math.random()*c.width,y:-Math.random()*c.height*.6,v:2+Math.random()*4,s:4+Math.random()*6,h:Math.random()*360}));let t=0;
+  (function f(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.y/30);x.fillStyle='hsl('+p.h+',90%,65%)';x.fillRect(p.x,p.y,p.s,p.s)});if(++t<260)requestAnimationFrame(f);else c.classList.add('hide')})();
 }
-async function countSession(){if(counted)return;counted=true;const s=await ab('hit','sesiones');if(s)$('ses').textContent=fmt(s)+' sesiones de música compartida'}
-initCounter();
+let CN=null;
+async function counter(){
+  const first=!store.get('bb-seen'),base='https://abacus.jasoncameron.dev/';
+  try{
+    let r=await fetch(base+(first?'hit':'get')+'/bibeat-app/usuarios');
+    if(!r.ok)r=await fetch(base+'hit/bibeat-app/usuarios');
+    const j=await r.json();CN=j.value;if(first)store.set('bb-seen','1');
+  }catch(e){}
+  if(CN==null){$('cntT').textContent='Contador sin conexión';return}
+  $('cntT').textContent=CN.toLocaleString('es')+' usuarios han usado BiBeat';
+  $('cntB').style.width=((CN%1000)/10)+'%';
+  if(first&&CN%1000===0)setTimeout(()=>story(CN,true),800);
+}
+$('cnt').onclick=()=>{if(CN!=null)story(CN,false)};
+$('storyX').onclick=()=>$('story').close();
 
-// ---------- VISUALIZADOR ----------
-function viz(node,c){an=c.createAnalyser();an.fftSize=128;node.connect(an)}
-const cv=$('cv'),g=cv.getContext('2d');let ph=0;
-(function draw(){
-  const d=devicePixelRatio||1,w=cv.clientWidth*d,h=cv.clientHeight*d;
-  if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}
-  g.clearRect(0,0,w,h);const N=40,bw=w/(N*2),data=an?new Uint8Array(an.frequencyBinCount):null;
-  if(an)an.getByteFrequencyData(data);
-  ph+=.04;let sum=0;
-  for(let i=0;i<N;i++){
-    const v=data?data[Math.floor(i*data.length*.7/N)]/255:(.12+.1*Math.sin(ph+i*.35));
-    sum+=v;const bh=Math.max(3*d,v*h*.95);
-    g.fillStyle='#28e0ff';g.fillRect(w/2-(i+1)*bw,h-bh,bw*.7,bh);
-    g.fillStyle='#ff3d8b';g.fillRect(w/2+i*bw+bw*.3,h-bh,bw*.7,bh);
-  }
-  document.documentElement.style.setProperty('--lvl',Math.min(1,sum/N*1.6).toFixed(2));
-  requestAnimationFrame(draw);
-})();
-$('bigB').onclick=()=>document.body.classList.add('big');
-document.addEventListener('click',e=>{if(document.body.classList.contains('big')&&e.target.id!=='bigB')document.body.classList.remove('big')});
-function setTitle(t){$('bigT').textContent=t||''}
+// ===== Cuentas =====
+const TYPES=[
+ {k:'pareja',l:'Pareja',c:'#ff7aa8',d:'Vuestro rincón a dos.'},
+ {k:'amigos',l:'Amigos',c:'#ffb454',d:'Plan de grupo, cada uno a su rollo pero a la vez.'},
+ {k:'familia',l:'Familia',c:'#7fd6c2',d:'Para toda la mesa.'},
+ {k:'fiesta',l:'Fiesta',c:'#c77dff',d:'Energía al máximo.'},
+ {k:'deporte',l:'Deporte',c:'#5ee08a',d:'Ritmo para entrenar acompañado.'},
+ {k:'focus',l:'Estudio / Focus',c:'#6fb3ff',d:'Concentración compartida.'},
+ {k:'viaje',l:'Viaje',c:'#ffd166',d:'Banda sonora de la carretera.'},
+ {k:'libre',l:'Libre',c:'#b9c0e6',d:'Sin categoría, todo vale.'}];
+const T=k=>TYPES.find(x=>x.k===k)||TYPES[7];
+let A;try{A=JSON.parse(store.get('bb-acc'))}catch(e){}
+if(!A||!A.list||!A.list.length)A={list:[{id:'a1',name:'Mi cuenta',type:'libre',sp:[]}],cur:'a1'};
+const acc=()=>A.list.find(x=>x.id===A.cur)||A.list[0];
+const saveA=()=>store.set('bb-acc',JSON.stringify(A));
+TYPES.forEach(t=>{const o=document.createElement('option');o.value=t.k;o.textContent=t.l;$('accType').appendChild(o)});
+function renderAcc(){
+  const s=$('accSel');s.textContent='';
+  A.list.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.name+' · '+T(a.type).l;s.appendChild(o)});
+  s.value=acc().id;const t=T(acc().type);
+  document.documentElement.style.setProperty('--a',t.c);$('accInfo').textContent=t.d;renderSp();
+}
+$('accSel').onchange=e=>{A.cur=e.target.value;saveA();renderAcc()};
+$('accNew').onclick=()=>$('accForm').classList.toggle('hide');
+$('accOk').onclick=()=>{
+  const n=$('accName').value.trim();if(!n)return;
+  const id='a'+Date.now();A.list.push({id,name:n,type:$('accType').value,sp:[]});A.cur=id;saveA();
+  $('accName').value='';$('accForm').classList.add('hide');renderAcc();
+};
+$('accDel').onclick=()=>{
+  if(A.list.length<2)return status('Debe quedar al menos una cuenta.','bad');
+  if(!confirm('¿Borrar la cuenta «'+acc().name+'»?'))return;
+  A.list=A.list.filter(x=>x!==acc());A.cur=A.list[0].id;saveA();renderAcc();
+};
 
-// ---------- ANFITRIÓN: conexión ----------
+// ===== Audio =====
 function ensureAudio(){
   if(ctx){ctx.resume();return}
-  ctx=new (window.AudioContext||window.webkitAudioContext)();
-  dest=ctx.createMediaStreamDestination();
-  delay=ctx.createDelay(2);delay.delayTime.value=$('dly').value/1000;
-  const src=ctx.createMediaElementSource($('player'));
-  src.connect(dest);src.connect(delay);delay.connect(ctx.destination);viz(src,ctx);
+  ctx=new AC();dest=ctx.createMediaStreamDestination();
+  delay=ctx.createDelay(2);src=ctx.createMediaElementSource(P);
+  src.connect(dest);src.connect(delay);delay.connect(ctx.destination);viz(src,ctx);setDelay(+(store.get('bb-delay')||200));
 }
+function setDelay(v){
+  v=Math.max(0,Math.min(1000,v));$('dly').value=v;$('dlyV').textContent=v;
+  if(delay)delay.delayTime.value=mode==='local'?0:v/1000;store.set('bb-delay',v);
+}
+$('dly').oninput=e=>setDelay(+e.target.value);
+$('dm').onclick=()=>setDelay(+$('dly').value-10);
+$('dp').onclick=()=>setDelay(+$('dly').value+10);
+P.onplay=()=>{if(ctx)ctx.resume()};
+
+// ===== Biblioteca =====
+let lib=[],cat='Todas',shuf=false,curT=null,curURL='';
+const AUD=/\.(mp3|m4a|aac|wav|flac|ogg|opus|weba|wma)$/i;
+function addFiles(fl){
+  [...fl].forEach(f=>{
+    if(!(f.type.startsWith('audio/')||AUD.test(f.name)))return;
+    const p=(f.webkitRelativePath||'').split('/'),c=p.length>2?p[1]:p.length===2?p[0]:'Sueltas';
+    if(lib.some(x=>x.f.name===f.name&&x.f.size===f.size))return;
+    lib.push({f,n:f.name.replace(/\.[^.]+$/,''),c});
+  });
+  lib.sort((a,b)=>a.c.localeCompare(b.c)||a.n.localeCompare(b.n,'es',{numeric:true}));
+  renderLib();status(lib.length+' canciones en la biblioteca.','ok');
+}
+const filt=()=>{const q=$('q').value.toLowerCase();return lib.filter(x=>(cat==='Todas'||x.c===cat)&&x.n.toLowerCase().includes(q))};
+function renderLib(){
+  const cs=['Todas',...new Set(lib.map(x=>x.c))],ch=$('chips');ch.textContent='';
+  if(cs.length>2)cs.forEach(c=>{const b=document.createElement('button');b.textContent=c+(c==='Todas'?' ('+lib.length+')':' ('+lib.filter(x=>x.c===c).length+')');if(c===cat)b.className='on';b.onclick=()=>{cat=c;renderLib()};ch.appendChild(b)});
+  const ol=$('list');ol.textContent='';const f=filt();
+  f.slice(0,300).forEach(t=>{const li=document.createElement('li'),b=document.createElement('button');b.textContent=t.n;if(t===curT)b.className='on';b.onclick=()=>play(t);li.appendChild(b);ol.appendChild(li)});
+  if(f.length>300){const li=document.createElement('li');li.className='mut';li.textContent='Hay '+(f.length-300)+' más: usa el buscador.';ol.appendChild(li)}
+}
+function bcast(m){conns.forEach(x=>x.c.open&&x.c.send(m))}
+function play(t){
+  ensureAudio();curT=t;if(curURL)URL.revokeObjectURL(curURL);
+  curURL=URL.createObjectURL(t.f);P.src=curURL;$('now').textContent=t.n;
+  bcast({t:t.n});renderLib();P.play().catch(()=>{});
+  if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:t.n,artist:t.c,album:'BiBeat'})}
+}
+function step(d){
+  const l=filt();if(!l.length)return;const i=l.indexOf(curT);
+  play(shuf?l[Math.floor(Math.random()*l.length)]:l[(i+d+l.length)%l.length]);
+}
+if('mediaSession' in navigator){navigator.mediaSession.setActionHandler('previoustrack',()=>step(-1));navigator.mediaSession.setActionHandler('nexttrack',()=>step(1))}
+$('fFiles').onchange=e=>{addFiles(e.target.files);e.target.value=''};
+$('fDir').onchange=e=>{addFiles(e.target.files);e.target.value=''};
+$('q').oninput=renderLib;
+$('prev').onclick=()=>step(-1);$('next').onclick=()=>step(1);
+$('shuf').onclick=()=>{shuf=!shuf;$('shuf').classList.toggle('on',shuf)};
+P.onended=()=>step(1);
+$('tabCap').onclick=async()=>{
+  try{
+    ensureAudio();
+    const st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
+    const at=st.getAudioTracks();st.getVideoTracks().forEach(t=>t.stop());
+    if(!at.length)return status('Marca «Compartir audio de la pestaña» en el selector.','bad');
+    ctx.createMediaStreamSource(new MediaStream(at)).connect(dest);
+    $('now').textContent='Audio de una pestaña';bcast({t:'Audio de una pestaña'});
+    status('Audio de la pestaña listo. Tú lo oyes directamente en tu PC.','ok');
+  }catch(e){status('No se pudo capturar la pestaña.','bad')}
+};
+$('srcTabs').onclick=e=>{
+  const t=e.target.dataset.t;if(!t)return;
+  [...$('srcTabs').children].forEach(b=>b.classList.toggle('on',b===e.target));
+  $('locPane').classList.toggle('hide',t!=='loc');$('spPane').classList.toggle('hide',t!=='sp');
+};
+
+// ===== Spotify (cada uno con su cuenta, sincronizado) =====
+let spReady=null,spLoad=false,hP=null,spU='';
+window.onSpotifyIframeApiReady=a=>{spReady=a};
+function spMount(box,uri,onUpd){
+  if(!spLoad){spLoad=true;const s=document.createElement('script');s.src='https://open.spotify.com/embed/iframe-api/v1';s.async=true;document.body.appendChild(s)}
+  return new Promise(res=>{
+    const go=()=>{box.textContent='';const d=document.createElement('div');box.appendChild(d);
+      spReady.createController(d,{uri,width:'100%',height:152},c=>{if(onUpd)c.addListener('playback_update',e=>onUpd(e.data));res(c)})};
+    if(spReady)go();else{const t=setInterval(()=>{if(spReady){clearInterval(t);go()}},300)}
+  });
+}
+function parseSp(s){
+  s=s.trim();let m=/^spotify:(track|album|playlist|episode|show|artist):([A-Za-z0-9]+)$/.exec(s);
+  if(m)return s;
+  m=/open\.spotify\.com\/(?:intl-[a-z]+\/)?(track|album|playlist|episode|show|artist)\/([A-Za-z0-9]+)/.exec(s);
+  return m?'spotify:'+m[1]+':'+m[2]:null;
+}
+async function spPlay(uri){
+  P.pause();spU=uri;lastSp={u:uri,p:true,t:0};
+  if(!hP)hP=spMount($('spBox'),uri,d=>{lastSp={u:spU,p:d.isPaused,t:Math.round(d.position/1000)};bcast({sp:lastSp})});
+  else(await hP).loadUri(uri);
+  bcast({sp:lastSp});$('now').textContent='Spotify';bcast({t:'Spotify'});
+  status('Pulsa play en el reproductor de Spotify.');
+}
+function renderSp(){
+  const l=$('spList');l.textContent='';
+  acc().sp.forEach((s,i)=>{
+    const r=document.createElement('div');r.className='row';r.style.marginTop='6px';
+    const b=document.createElement('button');b.textContent=s.n;b.onclick=()=>spPlay(s.u);
+    const x=document.createElement('button');x.textContent='×';x.setAttribute('aria-label','Quitar');x.style.flex='0 0 44px';
+    x.onclick=()=>{acc().sp.splice(i,1);saveA();renderSp()};
+    r.appendChild(b);r.appendChild(x);l.appendChild(r);
+  });
+}
+$('spGo').onclick=()=>{const u=parseSp($('spIn').value);if(!u)return status('Ese enlace de Spotify no es válido.','bad');spPlay(u)};
+$('spSave').onclick=()=>{
+  const u=parseSp($('spIn').value);if(!u)return status('Ese enlace de Spotify no es válido.','bad');
+  const n=prompt('Nombre para este enlace:');if(!n)return;
+  acc().sp.push({n:n.trim().slice(0,40),u});saveA();renderSp();status('Guardado en «'+acc().name+'».','ok');
+};
+
+// ===== Anfitrión =====
 function updListeners(){
   const n=conns.length;toggleOn(n>0);
-  $('listeners').textContent=n?(n===1?'1 persona escuchando.':n+' personas escuchando.'):'Todavía no hay nadie conectado. Quien abra el enlace entra directo, o puede escribir el código.';
-  if(n)status('Conectados. Ya suena en los dos móviles.','ok');
+  $('listeners').textContent=n?(n===1?'1 persona escuchando.':n+' personas escuchando.'):'Todavía no hay nadie. Quien abra el enlace entra directo, o puede escribir el código.';
+  if(n)status('Conectados. Ya se oye en los dos dispositivos.','ok');
 }
-function bcast(m){last=m;conns.forEach(x=>x.c.open&&x.c.send(m))}
 function openRoom(n){
-  roomCode=rnd(5);peer=new Peer('duo-'+roomCode);
-  peer.on('open',()=>{$('code').textContent=roomCode;status('Sala lista. Envíale el enlace o el código.')});
-  peer.on('error',e=>{if(e.type==='unavailable-id'&&n<5){peer.destroy();openRoom(n+1)}else status('No se pudo abrir la sala ('+e.type+'). Recarga la página.','bad')});
+  roomCode=rnd(5);peer=new Peer('duo-'+roomCode,{config:ICE});
+  peer.on('open',()=>{$('code').textContent=roomCode;status('Sala lista. Envía el enlace o el código.')});
+  peer.on('error',e=>{
+    if(e.type==='unavailable-id'&&n<5){peer.destroy();openRoom(n+1)}
+    else status('No se pudo abrir la sala ('+e.type+'). Recarga la página.','bad');
+  });
   peer.on('disconnected',()=>{try{peer.reconnect()}catch(e){}});
   peer.on('connection',c=>{
     c.on('open',()=>{
-      ensureAudio();
-      const call=peer.call(c.peer,dest.stream,{sdpTransform:hq}),item={c,call};
-      conns.push(item);updListeners();keepAwake();countSession();c.send(last);
-      const drop=()=>{conns=conns.filter(x=>x!==item);updListeners()};
-      call.on('close',drop);c.on('close',drop);
+      ensureAudio();const call=peer.call(c.peer,dest.stream,{sdpTransform:hq});
+      const it={c,call};conns.push(it);updListeners();keepAwake();
+      c.send({t:$('now').textContent});if(lastSp)c.send({sp:lastSp});
+      const drop=()=>{conns=conns.filter(x=>x!==it);updListeners()};call.on('close',drop);c.on('close',drop);
     });
   });
 }
-$('pickHost').onclick=()=>{
-  show('host');ensureAudio();openRoom(0);status('Abriendo sala…');updListeners();
-  if(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia&&!/Android|iPhone|iPad/i.test(navigator.userAgent))$('tabCap').classList.remove('hide');
-};
 const link=()=>location.href.split('?')[0].split('#')[0]+'?sala='+roomCode;
 $('copyLink').onclick=async()=>{if(!roomCode)return;try{await navigator.clipboard.writeText(link());status('Enlace copiado.','ok')}catch(e){prompt('Copia el enlace:',link())}};
 $('shareLink').onclick=async()=>{
@@ -291,139 +394,94 @@ $('shareLink').onclick=async()=>{
   else window.open('https://wa.me/?text='+encodeURIComponent(text+' '+link()));
 };
 
-// ---------- ANFITRIÓN: biblioteca ----------
-const AUD=/\.(mp3|m4a|aac|wav|ogg|oga|opus|flac|weba)$/i;
-const nm=f=>f.name.replace(/\.[^.]+$/,'');
-function addFiles(list){
-  const fs=[...list].filter(f=>(f.type&&f.type.startsWith('audio/'))||AUD.test(f.name));
-  if(!fs.length)return status('No he encontrado música en esa selección.','bad');
-  fs.sort((a,b)=>(a.webkitRelativePath||a.name).localeCompare(b.webkitRelativePath||b.name,'es',{numeric:true}));
-  queue=fs;$('q').classList.remove('hide');$('q').value='';
-  $('libInfo').textContent=fs.length+(fs.length===1?' canción cargada.':' canciones cargadas.');
-  renderList();loadTrack(0,false);
+// ===== Dos auriculares en el mismo dispositivo =====
+const outs={},dn={};
+const canSink=!!(HTMLMediaElement.prototype.setSinkId&&navigator.mediaDevices&&navigator.mediaDevices.selectAudioOutput);
+async function pick(k){
+  if(!canSink)return status('Este navegador no permite elegir salida de audio. Usa Chrome o Edge en PC.','bad');
+  try{outs[k]=await navigator.mediaDevices.selectAudioOutput();
+    $('outInfo').textContent='A: '+(outs.A?outs.A.label||'elegido':'—')+'  ·  B: '+(outs.B?outs.B.label||'elegido':'—')}catch(e){}
 }
-function renderList(){
-  const q=$('q').value.toLowerCase(),ol=$('list');ol.textContent='';
-  view=queue.map((f,i)=>i).filter(i=>(queue[i].webkitRelativePath||queue[i].name).toLowerCase().includes(q));
-  view.slice(0,300).forEach(i=>{
-    const li=document.createElement('li'),b=document.createElement('button');
-    b.textContent=nm(queue[i]);b.title=queue[i].webkitRelativePath||queue[i].name;if(i===qi)b.className='cur';
-    b.onclick=()=>loadTrack(i,true);li.appendChild(b);ol.appendChild(li);
-  });
-  if(view.length>300){const li=document.createElement('li');li.className='mut';li.textContent='Mostrando 300 de '+view.length+'. Usa el buscador.';ol.appendChild(li)}
-}
-function loadTrack(i,play){
-  ensureAudio();qi=i;const p=$('player'),t=nm(queue[i]);
-  p.src=URL.createObjectURL(queue[i]);$('now').textContent=t;setTitle(t);
-  renderList();bcast({m:'audio',t});if(play)p.play().catch(()=>{});
-  if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'BiBeat'});
-    [['play',()=>p.play()],['pause',()=>p.pause()],['previoustrack',prev],['nexttrack',next]].forEach(([a,f])=>{try{navigator.mediaSession.setActionHandler(a,f)}catch(e){}})}
-}
-function next(){if(!queue.length)return;loadTrack(shuf?Math.floor(Math.random()*queue.length):(qi+1)%queue.length,true)}
-function prev(){if(!queue.length)return;if($('player').currentTime>3)$('player').currentTime=0;else loadTrack((qi-1+queue.length)%queue.length,true)}
-$('pickDir').onclick=()=>$('dir').click();$('pickFiles').onclick=()=>$('files').click();
-$('dir').onchange=e=>addFiles(e.target.files);$('files').onchange=e=>addFiles(e.target.files);
-$('q').oninput=renderList;
-$('next2').onclick=next;$('prev').onclick=prev;
-$('shuf').onclick=e=>{shuf=!shuf;e.target.classList.toggle('on',shuf);e.target.textContent='Aleatorio: '+(shuf?'sí':'no')};
-$('rep').onclick=e=>{rep=(rep+1)%3;e.target.textContent='Repetir: '+['no','todo','una'][rep];e.target.classList.toggle('on',rep>0)};
-$('player').onended=()=>{if(rep===2){$('player').play()}else if(shuf||rep===1||qi+1<queue.length)next()};
-$('player').onplay=()=>{if(ctx)ctx.resume()};
-document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|BUTTON|AUDIO/.test(document.activeElement.tagName)&&!$('host').classList.contains('hide')&&!$('audioPanel').classList.contains('hide')){e.preventDefault();const p=$('player');p.paused?p.play():p.pause()}});
-function setDelay(v){v=Math.max(0,Math.min(1000,v));$('dly').value=v;$('dlyV').textContent=v;if(delay)delay.delayTime.value=v/1000;store.set('bb-delay',v)}
-$('dly').oninput=e=>setDelay(+e.target.value);$('dm').onclick=()=>setDelay(+$('dly').value-10);$('dp').onclick=()=>setDelay(+$('dly').value+10);
-{const s=store.get('bb-delay');if(s!==null)setDelay(+s)}
-$('tabCap').onclick=async()=>{
-  try{ensureAudio();const st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true});
-    const at=st.getAudioTracks();st.getVideoTracks().forEach(t=>t.stop());
-    if(!at.length)return status('Marca «Compartir audio de la pestaña» en el selector.','bad');
-    const s=ctx.createMediaStreamSource(new MediaStream(at));s.connect(dest);viz(s,ctx);
-    $('now').textContent='Audio de una pestaña';bcast({m:'audio',t:'Audio de una pestaña'});
-    status('Audio de la pestaña listo. Tú lo oyes directamente en tu PC.','ok');
-  }catch(e){status('No se pudo capturar la pestaña.','bad')}
-};
-
-// ---------- SPOTIFY ----------
-let spApi=null,spReady=null,hostSp=null,guestSp=null,spCur='',lastSp=null,gp=null,spLoading=false;
-window.onSpotifyIframeApiReady=a=>{spApi=a;if(spReady){const f=spReady;spReady=null;f()}};
-function mkSp(el,uri,cb){
-  const go=()=>spApi.createController(el,{uri,width:'100%',height:152},cb);
-  if(spApi)return go();spReady=go;
-  if(!$('spjs')){const s=document.createElement('script');s.id='spjs';s.src='https://open.spotify.com/embed/iframe-api/v1';s.async=true;document.body.appendChild(s)}
-}
-function parseSp(v){
-  const m=/spotify\.com\/(?:intl-[a-z]+\/)?(track|album|playlist|episode|show|artist)\/([A-Za-z0-9]+)/.exec(v)||/spotify:(track|album|playlist|episode|show|artist):([A-Za-z0-9]+)/.exec(v);
-  return m?'spotify:'+m[1]+':'+m[2]:null;
-}
-function setMode(m){
-  const sp=m==='sp';$('tabA').classList.toggle('sel',!sp);$('tabS').classList.toggle('sel',sp);
-  $('audioPanel').classList.toggle('hide',sp);$('spPanel').classList.toggle('hide',!sp);
-  if(sp){$('player').pause();bcast({m:'sp',u:spCur,p:true,t:0})}
-  else{if(hostSp)hostSp.pause();bcast({m:'audio',t:$('now').textContent==='Nada en reproducción'?'':$('now').textContent})}
-}
-$('tabA').onclick=()=>setMode('audio');
-$('tabS').onclick=()=>{setMode('sp');if(!spCur)status('Pega un enlace de Spotify y pulsa «Cargar en los dos».')};
-$('spGo').onclick=()=>{
-  const u=parseSp($('spIn').value);
-  if(!u)return status('Pega un enlace de Spotify: canción, álbum o lista.','bad');
-  spCur=u;setTitle('Spotify');
-  if(hostSp){hostSp.loadUri(u);bcast({m:'sp',u,p:true,t:0});return}
-  mkSp($('spHostEl'),u,c=>{
-    hostSp=c;
-    c.addListener('playback_update',e=>{const d=e.data;if(d.playingURI)spCur=d.playingURI;bcast({m:'sp',u:spCur,p:d.isPaused,t:d.position})});
-  });
-  bcast({m:'sp',u,p:true,t:0});
-};
-
-// ---------- INVITADA ----------
-function guestMode(m){$('gAudio').classList.toggle('hide',m==='sp');$('gSp').classList.toggle('hide',m!=='sp')}
-function applySp(d){
-  lastSp=d;
-  if(!guestSp){
-    if(!spLoading){spLoading=true;spCur=d.u;mkSp($('spGuestEl'),d.u,c=>{guestSp=c;c.addListener('playback_update',e=>{gp=e.data});setTimeout(()=>{if(lastSp&&!lastSp.p)c.play()},1500)})}
-    return;
+$('pA').onclick=()=>pick('A');$('pB').onclick=()=>pick('B');
+function offs(){const o=+$('off').value;$('offV').textContent=o;if(dn.A){dn.A.d.delayTime.value=o<0?-o/1000:0;dn.B.d.delayTime.value=o>0?o/1000:0}}
+$('off').oninput=offs;
+$('vA').oninput=e=>{if(dn.A)dn.A.a.volume=+e.target.value};
+$('vB').oninput=e=>{if(dn.B)dn.B.a.volume=+e.target.value};
+$('dGo').onclick=async()=>{
+  if(!canSink)return status('Este navegador no permite elegir salida de audio. Usa Chrome o Edge en PC.','bad');
+  if(!outs.A||!outs.B)return status('Elige primero los auriculares A y B.','bad');
+  if(outs.A.deviceId===outs.B.deviceId)return status('A y B son la misma salida. Elige dos distintas.','bad');
+  ensureAudio();try{delay.disconnect(ctx.destination)}catch(e){}
+  for(const k of ['A','B']){
+    const d=ctx.createDelay(1),m=ctx.createMediaStreamDestination(),a=new Audio();
+    src.connect(d);d.connect(m);a.srcObject=m.stream;a.volume=+$('v'+k).value;
+    await a.setSinkId(outs[k].deviceId);await a.play();dn[k]={d,m,a};
   }
-  if(d.u&&d.u!==spCur){spCur=d.u;guestSp.loadUri(d.u);setTimeout(()=>{if(lastSp&&!lastSp.p){guestSp.play();guestSp.seek(lastSp.t/1000)}},1500);return}
-  if(gp&&gp.isPaused!==d.p){d.p?guestSp.pause():guestSp.resume()}
-  if(gp&&!d.p&&Math.abs(gp.position-d.t)>2500)guestSp.seek(d.t/1000);
+  offs();$('dGo').classList.add('hide');$('dStop').classList.remove('hide');toggleOn(true);keepAwake();
+  status('Sonando en los dos auriculares. Dale play a una canción.','ok');
+};
+$('dStop').onclick=()=>{
+  ['A','B'].forEach(k=>{if(dn[k]){dn[k].a.pause();try{src.disconnect(dn[k].d)}catch(e){}delete dn[k]}});
+  delay.connect(ctx.destination);toggleOn(false);$('dStop').classList.add('hide');$('dGo').classList.remove('hide');status('Parado.');
+};
+
+// ===== Invitada =====
+let gP=null,gSt={p:true,t:0},gU='';
+async function gSpSync(m){
+  $('gSpBox').classList.remove('hide');
+  if(!gP){gU=m.u;gP=spMount($('gSpBox'),m.u,d=>{gSt={p:d.isPaused,t:Math.round(d.position/1000)}});return}
+  const c=await gP;
+  if(gU!==m.u){gU=m.u;c.loadUri(m.u);return}
+  if(m.p&&!gSt.p)c.pause();
+  if(!m.p&&gSt.p)c.resume();
+  if(!m.p&&Math.abs(gSt.t-m.t)>3)c.seek(m.t);
 }
-function onMsg(d){
-  if(!d)return;
-  if(d.m==='audio'){guestMode('audio');if(guestSp)guestSp.pause();$('title').textContent=d.t||'…';setTitle(d.t)}
-  else if(d.m==='sp'){guestMode('sp');$('title').textContent='Spotify';setTitle('Spotify');if(d.u)applySp(d)}
-}
-function openGuest(pre){
-  show('guest');
-  if(pre){$('codeIn').value=pre;status('Pulsa «Escuchar» para entrar en la sala.')}else status('Escribe el código de 5 letras.');
-}
-$('pickGuest').onclick=()=>openGuest('');
 $('codeIn').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'')};
 $('join').onclick=()=>{
   const code=$('codeIn').value.trim().toUpperCase();
   if(code.length!==5)return status('El código tiene 5 letras o números.','bad');
-  status('Conectando…');$('join').disabled=true;
-  if(peer)peer.destroy();peer=new Peer();
+  status('Conectando…');$('join').disabled=true;if(peer)peer.destroy();
+  peer=new Peer({config:ICE});
   peer.on('call',call=>{
     call.answer(undefined,{sdpTransform:hq});
     call.on('stream',s=>{
-      const a=$('remote');a.srcObject=s;
-      $('joinCard').classList.add('hide');$('listen').classList.remove('hide');
+      const a=$('remote');a.srcObject=s;$('joinCard').classList.add('hide');$('listen').classList.remove('hide');
       a.play().catch(()=>$('tapPlay').classList.remove('hide'));
-      try{const c=new (window.AudioContext||window.webkitAudioContext)();viz(c.createMediaStreamSource(s),c)}catch(e){}
-      toggleOn(true);keepAwake();status('Conectada. Ya suena en tus auriculares.','ok');
+      try{const c=new AC();viz(c.createMediaStreamSource(s),c)}catch(e){}
+      toggleOn(true);keepAwake();status('Conectada. Ya se oye en tus auriculares.','ok');
     });
     call.on('close',()=>{toggleOn(false);status('La sala se cerró.','bad')});
   });
   peer.on('open',()=>{
     const c=peer.connect('duo-'+code,{reliable:true});
-    c.on('data',onMsg);
+    c.on('data',d=>{if(!d)return;if(d.t!==undefined)$('title').textContent=d.t||'…';if(d.sp)gSpSync(d.sp)});
     c.on('close',()=>{toggleOn(false);status('El anfitrión cerró la sala.','bad')});
-    setTimeout(()=>{if(!document.body.classList.contains('on')&&$('join').disabled){status('No hay respuesta. Comprueba el código y que la sala siga abierta.','bad');$('join').disabled=false}},12000);
+    setTimeout(()=>{if(!document.body.classList.contains('on')&&$('join').disabled){status('Sin respuesta. Comprueba el código y que la sala siga abierta.','bad');$('join').disabled=false}},15000);
   });
   peer.on('error',e=>{$('join').disabled=false;status(e.type==='peer-unavailable'?'No existe esa sala. Revisa el código.':'Error de conexión ('+e.type+').','bad')});
 };
 $('tapPlay').onclick=()=>{$('remote').play();$('tapPlay').classList.add('hide')};
-{const m=/[?&]sala=([A-Za-z0-9]{5})/.exec(location.search);if(m)openGuest(m[1].toUpperCase())}
+
+// ===== Navegación =====
+function enter(m,prefill){
+  mode=m;$('home').classList.add('hide');
+  if(m==='guest'){$('guest').classList.remove('hide');if(prefill){$('codeIn').value=prefill;status('Pulsa «Escuchar» para entrar en la sala.')}else status('Escribe el código de 5 letras.');return}
+  ['acct','libCard'].forEach(i=>$(i).classList.remove('hide'));renderAcc();
+  if(m==='host'){
+    ['hostCard','hostSync'].forEach(i=>$(i).classList.remove('hide'));ensureAudio();openRoom(0);updListeners();status('Abriendo sala…');
+    if(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia&&!/Android|iPhone|iPad/i.test(navigator.userAgent))$('tabCap').classList.remove('hide');
+  }else{
+    $('dualCard').classList.remove('hide');$('tabSp').classList.add('hide');ensureAudio();setDelay(0);
+    $('dualNote').textContent=canSink?'Listo: elige las dos salidas y actívalas.':'Este navegador no permite elegir salida de audio (móviles y Safari). Funciona en Chrome o Edge de PC con los dos auriculares emparejados. En móvil usa «Audio dual» (Samsung) o Auracast.';
+    status('Carga música y elige las dos salidas.');
+  }
+}
+$('pickHost').onclick=()=>enter('host');
+$('pickGuest').onclick=()=>enter('guest');
+$('pickLocal').onclick=()=>enter('local');
+if(!('webkitdirectory' in document.createElement('input')))$('dirLbl').classList.add('hide');
+renderAcc();counter();
+{const m=/[?&]sala=([A-Za-z0-9]{5})/.exec(location.search);if(m)enter('guest',m[1].toUpperCase())}
 </script>
 </body>
 </html>
