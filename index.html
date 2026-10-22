@@ -4,76 +4,105 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BiBeat – dos auriculares, una canción</title>
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
-:root{--bg:#0b0e1d;--panel:rgba(26,32,64,.72);--line:#2f3a70;--txt:#eef0fa;--mut:#9aa3c7;--a:#b9c0e6;--b:#b9a6ff;--err:#ff8f9c;color-scheme:dark}
-*{box-sizing:border-box}
+:root{--bg:#000;--s1:#121214;--s2:#1c1c1f;--s3:#2c2c30;--line:rgba(255,255,255,.1);--txt:#fff;--mut:#a1a1aa;--a:#1ed760;--ig:linear-gradient(45deg,#f9ce34,#ee2a7b 55%,#6228d7);--err:#ff6b7a;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--txt);font:16px/1.5 "Gill Sans","Trebuchet MS",Verdana,sans-serif;padding:18px 16px 56px;overflow-x:hidden}
-.aurora{position:fixed;inset:-20%;z-index:-1;background:radial-gradient(40% 35% at 25% 20%,color-mix(in srgb,var(--a) 45%,transparent),transparent 70%),radial-gradient(45% 40% at 80% 75%,rgba(120,90,255,.4),transparent 70%);transform:scale(calc(1 + var(--lvl,0)*.18));transition:transform .12s,background 1s;animation:drift 14s ease-in-out infinite alternate}
-@keyframes drift{to{translate:4% -3%}}
-@media(prefers-reduced-motion:reduce){.aurora{animation:none;transition:none}}
-main{max-width:600px;margin:0 auto}
-header{text-align:center}
-.rings{width:170px;height:auto;display:block;margin:0 auto}
-.rings circle{fill:none;stroke-width:calc(5px + var(--lvl,0)*11px);transition:stroke-width .08s}
-.rings .r1{stroke:var(--a)}.rings .r2{stroke:var(--b)}
-h1{font-size:3rem;margin:0;letter-spacing:-.02em;line-height:1;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
-.tag{margin:6px 0 12px;color:var(--mut)}
-.pill{display:inline-flex;gap:8px;align-items:center;border-radius:99px;padding:8px 16px;font-size:.95rem}
-.bar{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin:10px auto 0;max-width:260px}
-.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:width 1.2s}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0;backdrop-filter:blur(8px)}
-button,.btn{font:inherit;color:var(--txt);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:11px;padding:10px 14px;cursor:pointer;text-align:center;display:inline-block}
-button:hover,.btn:hover{border-color:var(--a)}
-button:focus-visible,input:focus-visible,select:focus-visible,.btn:focus-within{outline:3px solid var(--b);outline-offset:2px}
-button.main{background:var(--a);color:#0b0e1d;border-color:var(--a);font-weight:700}
-button.on{border-color:var(--a);color:var(--a);font-weight:700}
+body{background:var(--bg);color:var(--txt);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding-bottom:110px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.aurora{position:fixed;left:-10%;right:-10%;top:0;height:55vh;z-index:-1;pointer-events:none;background:radial-gradient(50% 70% at 15% 0,color-mix(in srgb,var(--a) 40%,transparent),transparent 70%),radial-gradient(45% 60% at 90% 0,rgba(238,42,123,.3),transparent 70%);transform:scale(calc(1 + var(--lvl,0)*.1));transform-origin:top;transition:transform .12s,background .8s}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top));background:rgba(0,0,0,.55);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:6px;font-weight:800;font-size:1.3rem;letter-spacing:-.03em}
+.rings{width:50px;height:auto;display:block}
+.rings circle{fill:none;stroke-width:calc(7px + var(--lvl,0)*10px);transition:stroke-width .08s}
+.rings .r1{stroke:url(#gi)}.rings .r2{stroke:var(--a)}
+.pill{padding:6px 14px!important;font-size:.85rem;background:var(--s3)}
+.top .bar{position:absolute;left:0;right:0;bottom:-1px;height:2px;background:transparent}
+.bar i{display:block;height:100%;width:0;background:var(--ig);transition:width 1.2s}
+main{max-width:560px;margin:0 auto;padding:0 16px}
+.hero{font-size:2.2rem;line-height:1.06;letter-spacing:-.035em;font-weight:800;margin:26px 0 8px}
+.hero em{font-style:normal;background:var(--ig);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mut);margin:0 0 20px}
+.sec{font-weight:700;font-size:1.15rem;margin:28px 0 10px;letter-spacing:-.01em}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+.tile{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:18px;min-height:176px;padding:18px;border-radius:22px;background:var(--s2);border:1px solid var(--line);text-align:left;font-weight:400}
+.tile b{display:block;font-size:1.12rem;letter-spacing:-.01em;font-weight:700}
+.tile small{display:block;color:var(--mut);font-size:.85rem;line-height:1.3;margin-top:3px}
+.tile .ic{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:var(--ig);color:#fff}
+.tile.g .ic{background:var(--a);color:#000}
+.tile.wide{width:100%;min-height:0;flex-direction:row;align-items:center;margin-top:12px;border-radius:22px}
+.tile.wide .ic{background:var(--s3);flex:none}
+.uses{display:grid;gap:8px}
+.uses div{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.uses b{display:block}.uses span{color:var(--mut);font-size:.9rem}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:18px;margin:14px 0}
+button,.btn{font:inherit;font-weight:600;color:var(--txt);background:var(--s3);border:0;border-radius:99px;padding:11px 18px;cursor:pointer;text-align:center;display:inline-block;transition:transform .12s,filter .12s}
+button:active,.btn:active{transform:scale(.97)}
+button:hover,.btn:hover{filter:brightness(1.18)}
+button:focus-visible,input:focus-visible,select:focus-visible,.btn:focus-within{outline:3px solid #fff;outline-offset:2px}
+button.main{background:var(--a);color:#000}
+button.on{background:#fff;color:#000}
 button:disabled{opacity:.5}
-.home{display:grid;gap:10px}
-.home button{padding:18px;text-align:left;font-size:1.05rem}
-.home small{display:block;color:var(--mut);font-size:.85rem;margin-top:2px}
-input[type=text],select{width:100%;background:rgba(0,0,0,.3);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+input[type=text],select{width:100%;background:var(--s3);color:var(--txt);border:0;border-radius:12px;padding:12px 14px;font:inherit}
 #codeIn{font-size:1.8rem;letter-spacing:.3em;text-align:center;text-transform:uppercase}
 input[type=range]{width:100%;accent-color:var(--a)}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1}
-.step{font-weight:700;margin:0 0 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.row>*{flex:1}
+.step{font-weight:700;font-size:1.1rem;margin:0 0 10px;letter-spacing:-.01em}
 .mut{color:var(--mut);font-size:.9rem;margin:8px 0 0}
-#status{padding:10px 14px;border-radius:11px;border:1px solid var(--line);margin:12px 0;font-size:.95rem;background:var(--panel)}
+#status{position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));max-width:536px;margin:0 auto;z-index:6;padding:12px 16px;border-radius:16px;background:rgba(28,28,31,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--line);font-size:.93rem}
 #status.ok{border-color:var(--a)}#status.bad{border-color:var(--err);color:var(--err)}
-#code{font-size:3rem;font-weight:700;letter-spacing:.25em;text-align:center;color:var(--a);padding-left:.25em}
+#code{font-size:3rem;font-weight:800;letter-spacing:.25em;text-align:center;background:var(--ig);-webkit-background-clip:text;background-clip:text;color:transparent;padding-left:.25em}
 audio{width:100%;margin-top:10px}
-#now{font-weight:700;margin:10px 0 0;min-height:1.5em}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-.chips button{padding:5px 12px;border-radius:99px;font-size:.88rem}
-ol.list{list-style:none;margin:8px 0 0;padding:0;max-height:300px;overflow:auto}
-ol.list button{width:100%;text-align:left;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
-.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{flex:1}
-dialog{background:#141a36;color:var(--txt);border:1px solid var(--a);border-radius:16px;max-width:480px;width:calc(100% - 32px);max-height:80vh}
-dialog::backdrop{background:rgba(5,7,18,.75)}
+.np{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.np p{margin:0}#now{font-weight:700;font-size:1.15rem;min-height:1.5em;letter-spacing:-.01em}
+#fav{flex:none;background:transparent;font-size:1.7rem;padding:4px 10px;color:var(--mut)}
+#fav.on{color:#ee2a7b;background:transparent}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:12px 0;padding-bottom:2px}
+.chips button{flex:none;padding:6px 14px;font-size:.88rem}
+ol.list{list-style:none;margin:8px 0 0;padding:0;max-height:320px;overflow:auto}
+ol.list button{width:100%;text-align:left;background:transparent;border-radius:10px;padding:11px 8px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+ol.list button.on{background:transparent;color:var(--a);font-weight:700}
+.tabs{display:flex;gap:2px;margin-bottom:14px;background:var(--s3);border-radius:12px;padding:3px}
+.tabs button{flex:1;background:transparent;border-radius:9px;padding:8px}
+.tabs button.on{background:#636366;color:#fff}
+.way{background:var(--s2);border-radius:16px;padding:14px;margin-top:10px}
+.way b{display:block;margin-bottom:4px}.way span{display:block;color:var(--mut);font-size:.9rem;margin-bottom:6px}
+dialog{background:var(--s1);color:var(--txt);border:1px solid var(--line);border-radius:22px;max-width:480px;width:calc(100% - 32px);max-height:80vh}
+dialog::backdrop{background:rgba(0,0,0,.8)}
 .ch{border-left:3px solid var(--a);padding:2px 0 2px 12px;margin:14px 0}.ch.lock{opacity:.4;border-color:var(--line)}
 .ch b{display:block}
 #cf{position:fixed;inset:0;pointer-events:none;z-index:9}
 .hide{display:none!important}
-details{margin-top:18px}summary{cursor:pointer;font-weight:700}
+details{margin-top:22px}summary{cursor:pointer;font-weight:700}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="aurora"></div><canvas id="cf" class="hide"></canvas>
-<main>
-<header>
-  <svg class="rings" viewBox="0 0 150 80" aria-hidden="true"><circle class="r1" cx="52" cy="40" r="26"/><circle class="r2" cx="98" cy="40" r="26"/></svg>
-  <h1>BiBeat</h1>
-  <p class="tag">Dos auriculares. Una sola canción.</p>
-  <button class="pill" id="cnt" aria-haspopup="dialog"><span id="cntT">Contando oídos…</span></button>
+<div class="top">
+  <div class="brand"><svg class="rings" viewBox="0 0 150 80" aria-hidden="true"><defs><linearGradient id="gi" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#f9ce34"/><stop offset=".5" stop-color="#ee2a7b"/><stop offset="1" stop-color="#6228d7"/></linearGradient></defs><circle class="r1" cx="52" cy="40" r="24"/><circle class="r2" cx="98" cy="40" r="24"/></svg><span>BiBeat</span></div>
+  <button class="pill" id="cnt" aria-haspopup="dialog"><span id="cntT">…</span></button>
   <div class="bar" aria-hidden="true"><i id="cntB"></i></div>
-</header>
-
+</div>
+<main>
 <div id="status" role="status">Elige cómo quieres escuchar.</div>
-
-<section id="home" class="home">
-  <button id="pickHost">Pongo la música<small>Creas una sala y la otra persona entra con un código o enlace, desde cualquier red.</small></button>
-  <button id="pickGuest">Quiero escuchar<small>Entras en la sala de alguien con su código.</small></button>
-  <button id="pickLocal">Dos auriculares en este dispositivo<small>Cada uno con los suyos, mismo equipo.</small></button>
+<section id="home">
+  <h2 class="hero">Una canción, <em>dos auriculares</em>.</h2>
+  <p class="sub">Escuchad lo mismo a la vez, cada uno con los suyos y desde cualquier lugar.</p>
+  <div class="duo">
+    <button class="tile" id="pickHost"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4zM17 8.5a5 5 0 010 7M19.5 6a8.5 8.5 0 010 12"/></svg></span><span><b>Pongo la música</b><small>Crea una sala y comparte el código</small></span></button>
+    <button class="tile g" id="pickGuest"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-4a8 8 0 0116 0v4M4 15h3v5H5.5A1.5 1.5 0 014 18.5V15zm16 0h-3v5h1.5a1.5 1.5 0 001.5-1.5V15z"/></svg></span><span><b>Quiero escuchar</b><small>Entra con un código o enlace</small></span></button>
+  </div>
+  <button class="tile wide" id="pickLocal"><span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="12" r="5"/><circle cx="16" cy="12" r="5"/></svg></span><span><b>Dos auriculares, un dispositivo</b><small>Cada uno con los suyos, mismo equipo</small></span></button>
+  <p class="sec">Pensado para…</p>
+  <div class="uses">
+    <div><b>Cama y sofá</b><span>Uno pone la música, el otro escucha sin molestar.</span></div>
+    <div><b>Gym y carretera</b><span>Misma banda sonora, cada uno con sus cascos.</span></div>
+    <div><b>Fiesta silenciosa</b><span>Varias personas a la vez, cada una con sus auriculares.</span></div>
+  </div>
 </section>
 
 <section id="acct" class="card hide">
@@ -97,7 +126,8 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:700}
     <p class="mut">Las subcarpetas se convierten en categorías. En móvil, si no puedes elegir carpeta, entra en ella y selecciona todo en «Archivos».</p>
     <input type="text" id="q" placeholder="Buscar canción…" style="margin-top:10px" aria-label="Buscar">
     <div class="chips" id="chips"></div>
-    <p id="now"></p>
+    <div class="np"><div><p class="mut" style="margin:0">Sonando</p><p id="now">Elige una canción</p></div><button id="fav" aria-label="Favorita">♡</button></div>
+    <div class="row"><select id="sleep" aria-label="Temporizador"><option value="0">Temporizador: apagado</option><option value="15">Pausar en 15 min</option><option value="30">Pausar en 30 min</option><option value="60">Pausar en 60 min</option></select></div>
     <audio id="player" controls></audio>
     <div class="row"><button id="prev" aria-label="Anterior">⏮</button><button id="shuf">Aleatorio</button><button id="next" aria-label="Siguiente">⏭</button></div>
     <ol class="list" id="list"></ol>
@@ -114,13 +144,26 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:700}
 
 <section id="dualCard" class="card hide">
   <p class="step">Dos auriculares en este dispositivo</p>
-  <div class="row"><button id="pA">Elegir auriculares A</button><button id="pB">Elegir auriculares B</button></div>
-  <p class="mut" id="outInfo">Conéctalos antes por Bluetooth al equipo y pulsa cada botón.</p>
-  <div class="row"><button id="dGo" class="main">Activar los dos</button><button id="dStop" class="hide">Parar</button></div>
-  <label class="mut" style="display:block;margin-top:12px">Volumen A<input type="range" id="vA" min="0" max="1" step=".01" value="1"></label>
-  <label class="mut" style="display:block">Volumen B<input type="range" id="vB" min="0" max="1" step=".01" value="1"></label>
-  <label class="mut" style="display:block">Desfase de B respecto a A: <span id="offV">0</span> ms<input type="range" id="off" min="-300" max="300" step="5" value="0"></label>
-  <p class="mut" id="dualNote"></p>
+  <div id="dualOk" class="hide">
+    <label class="mut" style="display:block">Auriculares A<select id="selA"></select></label>
+    <label class="mut" style="display:block;margin-top:8px">Auriculares B<select id="selB"></select></label>
+    <div class="row"><button id="addOut" class="hide">Añadir salida…</button></div>
+    <div class="row"><button id="dGo" class="main">Activar los dos</button><button id="dStop" class="hide">Parar</button></div>
+    <label class="mut" style="display:block;margin-top:14px">Volumen A<input type="range" id="vA" min="0" max="1" step=".01" value="1"></label>
+    <label class="mut" style="display:block">Volumen B<input type="range" id="vB" min="0" max="1" step=".01" value="1"></label>
+    <label class="mut" style="display:block">Desfase de B respecto a A: <span id="offV">0</span> ms<input type="range" id="off" min="-300" max="300" step="5" value="0"></label>
+  </div>
+  <div id="dualNo" class="hide">
+    <p style="margin:0">Este navegador no ofrece dos salidas de audio a la vez; en móvil lo decide el sistema. Estas son las dos vías que sí funcionan:</p>
+    <div class="way"><b>1 · Compartir audio del sistema</b>
+      <span>Samsung: Ajustes › Conexiones › Bluetooth › ⋮ › Audio dual.</span>
+      <span>Android reciente con auriculares LE Audio: Ajustes › Dispositivos conectados, busca «Compartir audio».</span>
+      <span>iPhone con AirPods o Beats: Centro de control › AirPlay › Compartir audio.</span>
+      <span style="margin:0">Depende del modelo y la versión. Actívalo y reproduce aquí o en cualquier app.</span></div>
+    <div class="way"><b>2 · BiBeat con un segundo dispositivo</b>
+      <span>El móvil, tablet u ordenador de la otra persona entra con un código. Cada uno con sus auriculares.</span>
+      <button id="goHost" class="main">Crear sala ahora</button></div>
+  </div>
 </section>
 
 <section id="hostSync" class="card hide">
@@ -150,7 +193,7 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:700}
   <summary>Cómo usarlo</summary>
   <ol class="mut">
     <li><b>A distancia:</b> uno crea la sala y envía el enlace; el otro lo abre y pulsa «Escuchar». Pueden estar en redes distintas (wifi, datos…).</li>
-    <li><b>Mismo dispositivo:</b> funciona en Chrome o Edge de PC con los dos auriculares ya emparejados al equipo. Los móviles no permiten elegir salida de audio desde una web; ahí usa «Audio dual» (Samsung) o Auracast del sistema.</li>
+    <li><b>Mismo dispositivo:</b> BiBeat detecta si tu equipo ofrece dos salidas (PC con Chrome o Edge). Si no, te guía para activar Audio dual o Compartir audio del sistema, o para usar una sala con un segundo dispositivo.</li>
     <li><b>Cuentas:</b> cada una tiene su tipo (Pareja, Amigos, Fiesta…), su color y sus enlaces de Spotify guardados.</li>
   </ol>
   <p class="mut">Mantened pantalla encendida y pestaña abierta durante la sesión.</p>
@@ -208,7 +251,7 @@ async function counter(){
     const j=await r.json();CN=j.value;if(first)store.set('bb-seen','1');
   }catch(e){}
   if(CN==null){$('cntT').textContent='Contador sin conexión';return}
-  $('cntT').textContent=CN.toLocaleString('es')+' usuarios han usado BiBeat';
+  $('cntT').textContent=CN.toLocaleString('es')+' usuarios';
   $('cntB').style.width=((CN%1000)/10)+'%';
   if(first&&CN%1000===0)setTimeout(()=>story(CN,true),800);
 }
@@ -224,7 +267,7 @@ const TYPES=[
  {k:'deporte',l:'Deporte',c:'#5ee08a',d:'Ritmo para entrenar acompañado.'},
  {k:'focus',l:'Estudio / Focus',c:'#6fb3ff',d:'Concentración compartida.'},
  {k:'viaje',l:'Viaje',c:'#ffd166',d:'Banda sonora de la carretera.'},
- {k:'libre',l:'Libre',c:'#b9c0e6',d:'Sin categoría, todo vale.'}];
+ {k:'libre',l:'Libre',c:'#1ed760',d:'Sin categoría, todo vale.'}];
 const T=k=>TYPES.find(x=>x.k===k)||TYPES[7];
 let A;try{A=JSON.parse(store.get('bb-acc'))}catch(e){}
 if(!A||!A.list||!A.list.length)A={list:[{id:'a1',name:'Mi cuenta',type:'libre',sp:[]}],cur:'a1'};
@@ -279,10 +322,10 @@ function addFiles(fl){
   lib.sort((a,b)=>a.c.localeCompare(b.c)||a.n.localeCompare(b.n,'es',{numeric:true}));
   renderLib();status(lib.length+' canciones en la biblioteca.','ok');
 }
-const filt=()=>{const q=$('q').value.toLowerCase();return lib.filter(x=>(cat==='Todas'||x.c===cat)&&x.n.toLowerCase().includes(q))};
+const filt=()=>{const q=$('q').value.toLowerCase();return lib.filter(x=>(cat==='Todas'||(cat==='♥'?(acc().fav||[]).includes(x.n):x.c===cat))&&x.n.toLowerCase().includes(q))};
 function renderLib(){
   const cs=['Todas',...new Set(lib.map(x=>x.c))],ch=$('chips');ch.textContent='';
-  if(cs.length>2)cs.forEach(c=>{const b=document.createElement('button');b.textContent=c+(c==='Todas'?' ('+lib.length+')':' ('+lib.filter(x=>x.c===c).length+')');if(c===cat)b.className='on';b.onclick=()=>{cat=c;renderLib()};ch.appendChild(b)});
+  const fv=(acc().fav||[]).length;if(cs.length>2||fv)[cs[0],...(fv?['♥']:[]),...cs.slice(1)].forEach(c=>{const b=document.createElement('button');b.textContent=c==='Todas'?'Todas ('+lib.length+')':c==='♥'?'♥ Favoritas':c+' ('+lib.filter(x=>x.c===c).length+')';if(c===cat)b.className='on';b.onclick=()=>{cat=c;renderLib()};ch.appendChild(b)});
   const ol=$('list');ol.textContent='';const f=filt();
   f.slice(0,300).forEach(t=>{const li=document.createElement('li'),b=document.createElement('button');b.textContent=t.n;if(t===curT)b.className='on';b.onclick=()=>play(t);li.appendChild(b);ol.appendChild(li)});
   if(f.length>300){const li=document.createElement('li');li.className='mut';li.textContent='Hay '+(f.length-300)+' más: usa el buscador.';ol.appendChild(li)}
@@ -291,7 +334,7 @@ function bcast(m){conns.forEach(x=>x.c.open&&x.c.send(m))}
 function play(t){
   ensureAudio();curT=t;if(curURL)URL.revokeObjectURL(curURL);
   curURL=URL.createObjectURL(t.f);P.src=curURL;$('now').textContent=t.n;
-  bcast({t:t.n});renderLib();P.play().catch(()=>{});
+  bcast({t:t.n});renderLib();favUI();P.play().catch(()=>{});
   if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:t.n,artist:t.c,album:'BiBeat'})}
 }
 function step(d){
@@ -395,34 +438,66 @@ $('shareLink').onclick=async()=>{
 };
 
 // ===== Dos auriculares en el mismo dispositivo =====
-const outs={},dn={};
-const canSink=!!(HTMLMediaElement.prototype.setSinkId&&navigator.mediaDevices&&navigator.mediaDevices.selectAudioOutput);
-async function pick(k){
-  if(!canSink)return status('Este navegador no permite elegir salida de audio. Usa Chrome o Edge en PC.','bad');
-  try{outs[k]=await navigator.mediaDevices.selectAudioOutput();
-    $('outInfo').textContent='A: '+(outs.A?outs.A.label||'elegido':'—')+'  ·  B: '+(outs.B?outs.B.label||'elegido':'—')}catch(e){}
+const dn={};
+const canSink=!!HTMLMediaElement.prototype.setSinkId;
+const canPick=!!(navigator.mediaDevices&&navigator.mediaDevices.selectAudioOutput);
+async function scanOuts(){
+  let l=[];
+  try{l=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audiooutput'&&d.deviceId!=='default'&&d.deviceId!=='communications')}catch(e){}
+  const seen=new Set();l=l.filter(d=>!seen.has(d.deviceId)&&seen.add(d.deviceId));
+  ['A','B'].forEach((k,j)=>{
+    const sl=$('sel'+k),v=sl.value;sl.textContent='';
+    l.forEach((d,i)=>{const o=document.createElement('option');o.value=d.deviceId;o.textContent=d.label||'Salida '+(i+1);sl.appendChild(o)});
+    sl.value=l.some(d=>d.deviceId===v)?v:((l[j]||l[0]||{}).deviceId||'');
+  });
+  const ok=canSink&&(l.length>=2||canPick);
+  $('dualOk').classList.toggle('hide',!ok);$('dualNo').classList.toggle('hide',ok);
+  $('addOut').classList.toggle('hide',!canPick);
+  if(ok&&l.length<2)status('Pulsa «Añadir salida» para elegir cada auricular.');
+  else if(ok)status('Elige A y B y pulsa «Activar los dos».');
+  else status('Este dispositivo no ofrece dos salidas a la web. Mira las opciones.','bad');
 }
-$('pA').onclick=()=>pick('A');$('pB').onclick=()=>pick('B');
+$('addOut').onclick=async()=>{try{await navigator.mediaDevices.selectAudioOutput();await scanOuts()}catch(e){}};
+if(navigator.mediaDevices&&navigator.mediaDevices.addEventListener)navigator.mediaDevices.addEventListener('devicechange',()=>{if(mode==='local'&&!dn.A)scanOuts()});
 function offs(){const o=+$('off').value;$('offV').textContent=o;if(dn.A){dn.A.d.delayTime.value=o<0?-o/1000:0;dn.B.d.delayTime.value=o>0?o/1000:0}}
 $('off').oninput=offs;
 $('vA').oninput=e=>{if(dn.A)dn.A.a.volume=+e.target.value};
 $('vB').oninput=e=>{if(dn.B)dn.B.a.volume=+e.target.value};
+function stopDual(){
+  ['A','B'].forEach(k=>{if(dn[k]){dn[k].a.pause();try{src.disconnect(dn[k].d)}catch(e){}delete dn[k]}});
+  try{delay.connect(ctx.destination)}catch(e){}
+  toggleOn(false);$('dStop').classList.add('hide');$('dGo').classList.remove('hide');
+}
 $('dGo').onclick=async()=>{
-  if(!canSink)return status('Este navegador no permite elegir salida de audio. Usa Chrome o Edge en PC.','bad');
-  if(!outs.A||!outs.B)return status('Elige primero los auriculares A y B.','bad');
-  if(outs.A.deviceId===outs.B.deviceId)return status('A y B son la misma salida. Elige dos distintas.','bad');
+  const ids={A:$('selA').value,B:$('selB').value};
+  if(!ids.A||!ids.B||ids.A===ids.B)return status('Elige dos salidas distintas.','bad');
   ensureAudio();try{delay.disconnect(ctx.destination)}catch(e){}
-  for(const k of ['A','B']){
-    const d=ctx.createDelay(1),m=ctx.createMediaStreamDestination(),a=new Audio();
-    src.connect(d);d.connect(m);a.srcObject=m.stream;a.volume=+$('v'+k).value;
-    await a.setSinkId(outs[k].deviceId);await a.play();dn[k]={d,m,a};
+  try{
+    for(const k of ['A','B']){
+      const d=ctx.createDelay(1),m=ctx.createMediaStreamDestination(),a=new Audio();
+      src.connect(d);d.connect(m);a.srcObject=m.stream;a.volume=+$('v'+k).value;
+      await a.setSinkId(ids[k]);await a.play();dn[k]={d,m,a};
+    }
+  }catch(e){
+    stopDual();$('dualOk').classList.add('hide');$('dualNo').classList.remove('hide');
+    return status('Este dispositivo no pudo abrir las dos salidas ('+e.name+').','bad');
   }
   offs();$('dGo').classList.add('hide');$('dStop').classList.remove('hide');toggleOn(true);keepAwake();
   status('Sonando en los dos auriculares. Dale play a una canción.','ok');
 };
-$('dStop').onclick=()=>{
-  ['A','B'].forEach(k=>{if(dn[k]){dn[k].a.pause();try{src.disconnect(dn[k].d)}catch(e){}delete dn[k]}});
-  delay.connect(ctx.destination);toggleOn(false);$('dStop').classList.add('hide');$('dGo').classList.remove('hide');status('Parado.');
+$('dStop').onclick=()=>{stopDual();status('Parado.')};
+$('goHost').onclick=()=>{$('dualCard').classList.add('hide');$('tabSp').classList.remove('hide');setDelay(+(store.get('bb-delay')||200));enter('host')};
+
+// ===== Favoritas y temporizador =====
+function favUI(){const f=!!curT&&(acc().fav||[]).includes(curT.n);$('fav').textContent=f?'♥':'♡';$('fav').classList.toggle('on',f)}
+$('fav').onclick=()=>{
+  if(!curT)return;const f=acc().fav=acc().fav||[],i=f.indexOf(curT.n);
+  if(i<0)f.push(curT.n);else f.splice(i,1);saveA();favUI();renderLib();
+};
+let sl;
+$('sleep').onchange=e=>{
+  clearTimeout(sl);const m=+e.target.value;
+  if(m){sl=setTimeout(()=>{P.pause();$('sleep').value='0';status('Temporizador: música en pausa. Buenas noches.')},m*60000);status('La música se pausará en '+m+' minutos.','ok')}
 };
 
 // ===== Invitada =====
@@ -472,7 +547,7 @@ function enter(m,prefill){
     if(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia&&!/Android|iPhone|iPad/i.test(navigator.userAgent))$('tabCap').classList.remove('hide');
   }else{
     $('dualCard').classList.remove('hide');$('tabSp').classList.add('hide');ensureAudio();setDelay(0);
-    $('dualNote').textContent=canSink?'Listo: elige las dos salidas y actívalas.':'Este navegador no permite elegir salida de audio (móviles y Safari). Funciona en Chrome o Edge de PC con los dos auriculares emparejados. En móvil usa «Audio dual» (Samsung) o Auracast.';
+    scanOuts();
     status('Carga música y elige las dos salidas.');
   }
 }
